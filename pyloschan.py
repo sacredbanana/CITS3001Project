@@ -134,6 +134,8 @@ class Player(object):
     def __init__(self, name):
         self.name = name
 
+    #TODO: place black or white pieces automaticall based on player rather than hand input
+    #TODO: make it so that it takes inputs from keyboard
     def place(self, letter, position, piece):
         if letter == "A":
             if A[position] == "e":
