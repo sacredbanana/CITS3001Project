@@ -72,24 +72,51 @@ class Board(object):
             print(player.name + " won!")
 
     def board_visual(self):
-        ### LEVEL ZERO ###
-        print("Level: 0")
+        print("Level: 0     Level: 1   Level: 2  Level: 3")
+        ##################################################### LINE 1
         for i in A:
+            print("|", end="")
+            print(i, end="")
+        print("|    ", end="")
+        for i in E:
+            print("|", end="")
+            print(i, end="")
+        print("|    ", end="")
+        for i in H:
+            print("|", end="")
+            print(i, end="")
+        print("|     ", end="")
+        for i in J:
             print("|",end="")
             print(i, end="")
         print("|")
+        #################################################### LINE 2
         for i in B:
             print("|",end="")
             print(i, end="")
+        print("|    ", end="")
+        for i in F:
+            print("|", end="")
+            print(i, end="")
+        print("|    ", end="")
+        for i in I:
+            print("|",end="")
+            print(i, end="")
         print("|")
+        #################################################### LINE 3
         for i in C:
             print("|",end="")
+            print(i, end="")
+        print("|    ", end="")
+        for i in G:
+            print("|", end="")
             print(i, end="")
         print("|")
         for i in D:
             print("|", end="")
             print(i, end="")
         print("|\n")
+        ####################################################
 
 
 
