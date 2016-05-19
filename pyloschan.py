@@ -1,3 +1,6 @@
+#######################################
+############ Class: Board  ############
+#######################################
 class Board(object):
 
     def __init__(self,player1,player2):  # player1 begins the game, player1 is white
@@ -118,35 +121,90 @@ class Board(object):
         print("|\n")
         ####################################################
 
+    def testtest(self):
+        player = self.white
+        player.place("A", 2, "b")
 
 
+#######################################
+############ Class: Player ############
+#######################################
 class Player(object):
 
     def __init__(self, name):
         self.name = name
 
-    def move(self, position):
-        while True:
-            try:
-                return input()
-            except:
-                print("Invalid input")
+    def place(self, letter, position, piece):
+        if letter == "A":
+            if A[position] == "e":
+                A[position] = piece
+            else:
+                print("position not empty.")
+        elif letter == "B":
+            if B[position] == "e":
+                B[position] = piece
+            else:
+                print("position not empty.")
+        elif letter == "C":
+            if B[position] == "e":
+                B[position] = piece
+            else:
+                print("position not empty.")
+        elif letter == "D":
+            if B[position] == "e":
+                B[position] = piece
+            else:
+                print("position not empty.")
+        elif letter == "E":
+            if B[position] == "e":
+                B[position] = piece
+            else:
+                print("position not empty.")
+        elif letter == "F":
+            if B[position] == "e":
+                B[position] = piece
+            else:
+                print("position not empty.")
+        elif letter == "G":
+            if B[position] == "e":
+                B[position] = piece
+            else:
+                print("position not empty.")
+        elif letter == "H":
+            if B[position] == "e":
+                B[position] = piece
+            else:
+                print("position not empty.")
+        elif letter == "I":
+            if B[position] == "e":
+                B[position] = piece
+            else:
+                print("position not empty.")
+        elif letter == "J":
+            if B[position] == "e":
+                B[position] = piece
+            else:
+                print("position not empty.")
 
 
-#Sets Up Game
+#######################################
+########### Sets up the game ##########
+#######################################
 def main():
 
     print("Welcome to Pylos")
-    player1 = input("Is player1 human or machine? (h or m) ")
+    player1 = input("Is player 1 (white) human or machine? (h or m) ")
     if(player1=="h"): player1 = Player("Player 1")
     elif(player1=="m"): player1 = Machine("Machine Player 1")
     else: return
-    player2 = input("Is player2 human or machine? (h or m) ")
+    player2 = input("Is player 2 (black) human or machine? (h or m) ")
     if(player2=="h"): player2 = Player("Player 2")
     elif(player2=="m"): player2 = Machine("Machine Player 2")
     else: return
     myBoard = Board(player1,player2)
     ##myBoard.play()
+    myBoard.board_visual()
+    myBoard.testtest()
     myBoard.board_visual()
 
 
