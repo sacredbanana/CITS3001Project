@@ -60,12 +60,11 @@ class Board(object):
             #Get player's move Z[0,0]
             input_list = player.move()
             if player is self.white: # minus one piece from player
-                self.place(str(input_list[0]),  int(input_list[1]), "w")
-                self.whitepieces -= 1
+                if self.place(str(input_list[0]),  int(input_list[1]), "w"):
+                    self.whitepieces -= 1
             else:
-                self.place(str(input_list[0]),  int(input_list[1]), "b")
-                self.blackpieces -= 1
-            break
+                if self.place(str(input_list[0]),  int(input_list[1]), "b"):
+                    self.blackpieces -= 1
             #else:
             #    print("Your move is illegal, thus you lost the game.")
             #    self.win(switchPlayer(player))
@@ -127,53 +126,73 @@ class Board(object):
         if letter == "A":
             if A[position] == "e":
                 A[position] = piece
+                return True
             else:
                 print("position not empty.")
+                return False
         elif letter == "B":
             if B[position] == "e":
                 B[position] = piece
+                return True
             else:
                 print("position not empty.")
+                return False
         elif letter == "C":
-            if B[position] == "e":
-                B[position] = piece
+            if C[position] == "e":
+                C[position] = piece
+                return True
             else:
                 print("position not empty.")
+                return False
         elif letter == "D":
-            if B[position] == "e":
-                B[position] = piece
+            if D[position] == "e":
+                D[position] = piece
+                return True
             else:
                 print("position not empty.")
+                return False
         elif letter == "E":
-            if B[position] == "e":
-                B[position] = piece
+            if E[position] == "e":
+                E[position] = piece
+                return True
             else:
                 print("position not empty.")
+                return False
         elif letter == "F":
-            if B[position] == "e":
-                B[position] = piece
+            if F[position] == "e":
+                F[position] = piece
+                return True
             else:
                 print("position not empty.")
+                return False
         elif letter == "G":
-            if B[position] == "e":
-                B[position] = piece
+            if G[position] == "e":
+                G[position] = piece
+                return True
             else:
                 print("position not empty.")
+                return False
         elif letter == "H":
-            if B[position] == "e":
-                B[position] = piece
+            if H[position] == "e":
+                H[position] = piece
+                return True
             else:
                 print("position not empty.")
+                return False
         elif letter == "I":
-            if B[position] == "e":
-                B[position] = piece
+            if I[position] == "e":
+                I[position] = piece
+                return True
             else:
                 print("position not empty.")
+                return False
         elif letter == "J":
-            if B[position] == "e":
-                B[position] = piece
+            if J[position] == "e":
+                J[position] = piece
+                return True
             else:
                 print("position not empty.")
+                return False
 
 
 
