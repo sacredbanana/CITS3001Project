@@ -50,6 +50,7 @@ class Board(object):
         player = self.white
 
         while True:  # game playing
+            self.board_update()
             self.board_visual()
             #Tell player it's their turn
             print("Your move, " + player.name + ", you have ", end="")
@@ -204,6 +205,11 @@ class Board(object):
         else:
             print("Invalid input, please check if your position is a valid input.")
             return False
+
+    ### unlocks sealed spaces on upper levels
+    def board_update(self):
+        if(A[0] != "e" and A[1] != "e" and B[0] != "e" and B[1] != "e" and E[0] == "s"):  #unlocks E1
+            E[0] = "e"
 
 
 
