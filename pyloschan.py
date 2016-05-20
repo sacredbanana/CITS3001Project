@@ -51,13 +51,15 @@ class Board(object):
 
         while True:  # game playing
             self.board_visual()
-            print("")
-            print("Your move, " + player.name)
+            #Tell player it's their turn
+            print("Your move, " + player.name + ", you have ", end="")
             if player is self.white:
-                print(player.name + ", you have " + self.whitepieces + " left")
+                print(str(self.whitepieces) + " pieces left")
             else:
-                print(player.name + ", you have " + self.blackpieces + " left")
+                print(str(self.blackpieces) + " pieces left")
             #Get player's move Z[0,0]
+            break
+            '''
             move = player.move()
             if move == "e":  # if position is empty, make move
                 if player is self.white: # minus one piece from player
@@ -69,7 +71,7 @@ class Board(object):
                 self.win(switchPlayer(player))
                 break
             player = switchPlayer(player)
-
+            '''
 
         def win(self,player):
             print(player.name + " won!")
@@ -196,18 +198,19 @@ def main():
 
     print("Welcome to Pylos")
     player1 = input("Is player 1 (white) human or machine? (h or m) ")
-    if(player1=="h"): player1 = Player("Player 1")
-    elif(player1=="m"): player1 = Machine("Machine Player 1")
+    if(player1=="h"): player1 = Player("White")
+    elif(player1=="m"): player1 = Machine("Machine White")
     else: return
     player2 = input("Is player 2 (black) human or machine? (h or m) ")
-    if(player2=="h"): player2 = Player("Player 2")
-    elif(player2=="m"): player2 = Machine("Machine Player 2")
+    if(player2=="h"): player2 = Player("Black")
+    elif(player2=="m"): player2 = Machine("Machine Black")
     else: return
+    print("'e' represents an empty block and 's' represents a sealed block")
     myBoard = Board(player1,player2)
-    ##myBoard.play()
-    myBoard.board_visual()
-    myBoard.testtest()
-    myBoard.board_visual()
+    myBoard.play()
+    #myBoard.board_visual()
+    #myBoard.testtest()
+    #myBoard.board_visual()
 
 
 
