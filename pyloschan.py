@@ -74,45 +74,56 @@ class Board(object):
 
     def board_visual(self):
         print("Level: 0     Level: 1   Level: 2  Level: 3")
+        print("  0 1 2 3      0 1 2      0 1       0")
         ##################################################### LINE 1
+        print("A",end="")
         for i in A:
             print("|", end="")
             print(i, end="")
-        print("|    ", end="")
+        print("|   ", end="")
+        print("E",end="")
         for i in E:
             print("|", end="")
             print(i, end="")
-        print("|    ", end="")
+        print("|   ", end="")
+        print("H",end="")
         for i in H:
             print("|", end="")
             print(i, end="")
-        print("|     ", end="")
+        print("|    ", end="")
+        print("J",end="")
         for i in J:
             print("|",end="")
             print(i, end="")
         print("|")
+        print("B",end="")
         #################################################### LINE 2
         for i in B:
             print("|",end="")
             print(i, end="")
-        print("|    ", end="")
+        print("|   ", end="")
+        print("F",end="")
         for i in F:
             print("|", end="")
             print(i, end="")
-        print("|    ", end="")
+        print("|   ", end="")
+        print("I",end="")
         for i in I:
             print("|",end="")
             print(i, end="")
         print("|")
+        print("C",end="")
         #################################################### LINE 3
         for i in C:
             print("|",end="")
             print(i, end="")
-        print("|    ", end="")
+        print("|   ", end="")
+        print("G",end="")
         for i in G:
             print("|", end="")
             print(i, end="")
         print("|")
+        print("D",end="")
         for i in D:
             print("|", end="")
             print(i, end="")
