@@ -62,10 +62,11 @@ class Board(object):
             if player is self.white: # minus one piece from player
                 if self.place(str(input_list[0]),  int(input_list[1]), "w"):
                     self.whitepieces -= 1
+                    player = switchPlayer(player)
             else:
                 if self.place(str(input_list[0]),  int(input_list[1]), "b"):
                     self.blackpieces -= 1
-            player = switchPlayer(player)
+                    player = switchPlayer(player)
 
 
         def win(self,player):
@@ -126,63 +127,63 @@ class Board(object):
             else:
                 print("position not empty.")
                 return False
-        elif letter == "B":
+        elif letter == "B" and position >= 0 and position <= 3:
             if B[position] == "e":
                 B[position] = piece
                 return True
             else:
                 print("position not empty.")
                 return False
-        elif letter == "C":
+        elif letter == "C" and position >= 0 and position <= 3:
             if C[position] == "e":
                 C[position] = piece
                 return True
             else:
                 print("position not empty.")
                 return False
-        elif letter == "D":
+        elif letter == "D" and position >= 0 and position <= 3:
             if D[position] == "e":
                 D[position] = piece
                 return True
             else:
                 print("position not empty.")
                 return False
-        elif letter == "E":
+        elif letter == "E" and position >= 0 and position <= 2:
             if E[position] == "e":
                 E[position] = piece
                 return True
             else:
                 print("position not empty.")
                 return False
-        elif letter == "F":
+        elif letter == "F" and position >= 0 and position <= 2:
             if F[position] == "e":
                 F[position] = piece
                 return True
             else:
                 print("position not empty.")
                 return False
-        elif letter == "G":
+        elif letter == "G" and position >= 0 and position <= 2:
             if G[position] == "e":
                 G[position] = piece
                 return True
             else:
                 print("position not empty.")
                 return False
-        elif letter == "H":
+        elif letter == "H" and position >= 0 and position <= 1:
             if H[position] == "e":
                 H[position] = piece
                 return True
             else:
                 print("position not empty.")
                 return False
-        elif letter == "I":
+        elif letter == "I" and position >= 0 and position <= 1:
             if I[position] == "e":
                 I[position] = piece
                 return True
             else:
                 print("position not empty.")
                 return False
-        elif letter == "J":
+        elif letter == "J" and position == 0:
             if J[position] == "e":
                 J[position] = piece
                 return True
@@ -190,7 +191,8 @@ class Board(object):
                 print("position not empty.")
                 return False
         else:
-            print("invalid input.")
+            print("Invalid input, please check if your position is a valid input.")
+            return False
 
 
 
