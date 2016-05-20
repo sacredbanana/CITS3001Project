@@ -65,11 +65,7 @@ class Board(object):
             else:
                 if self.place(str(input_list[0]),  int(input_list[1]), "b"):
                     self.blackpieces -= 1
-            #else:
-            #    print("Your move is illegal, thus you lost the game.")
-            #    self.win(switchPlayer(player))
-            #    break
-            #player = switchPlayer(player)
+            player = switchPlayer(player)
 
 
         def win(self,player):
