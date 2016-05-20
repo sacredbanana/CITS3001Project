@@ -119,7 +119,7 @@ class Board(object):
         ####################################################
 
     def place(self, letter, position, piece):
-        if letter == "A":
+        if letter == "A" and position >= 0 and position <= 3:
             if A[position] == "e":
                 A[position] = piece
                 return True
@@ -189,6 +189,8 @@ class Board(object):
             else:
                 print("position not empty.")
                 return False
+        else:
+            print("invalid input.")
 
 
 
