@@ -58,20 +58,20 @@ class Board(object):
             else:
                 print(str(self.blackpieces) + " pieces left")
             #Get player's move Z[0,0]
-            break
-            '''
-            move = player.move()
-            if move == "e":  # if position is empty, make move
-                if player is self.white: # minus one piece from player
-                    self.whitepieces -= 1
-                else:
-                    self.blackpieces -= 1
+            input_list = player.move()
+            if player is self.white: # minus one piece from player
+                self.place(str(input_list[0]),  int(input_list[1]), "w")
+                self.whitepieces -= 1
             else:
-                print("Your move is illegal, thus you lost the game.")
-                self.win(switchPlayer(player))
-                break
-            player = switchPlayer(player)
-            '''
+                self.place(str(input_list[0]),  int(input_list[1]), "b")
+                self.blackpieces -= 1
+            break
+            #else:
+            #    print("Your move is illegal, thus you lost the game.")
+            #    self.win(switchPlayer(player))
+            #    break
+            #player = switchPlayer(player)
+
 
         def win(self,player):
             print(player.name + " won!")
@@ -123,21 +123,6 @@ class Board(object):
         print("|\n")
         ####################################################
 
-    def testtest(self):
-        player = self.white
-        player.place("A", 2, "b")
-
-
-#######################################
-############ Class: Player ############
-#######################################
-class Player(object):
-
-    def __init__(self, name):
-        self.name = name
-
-    #TODO: place black or white pieces automaticall based on player rather than hand input
-    #TODO: make it so that it takes inputs from keyboard
     def place(self, letter, position, piece):
         if letter == "A":
             if A[position] == "e":
@@ -191,6 +176,21 @@ class Player(object):
                 print("position not empty.")
 
 
+
+#######################################
+############ Class: Player ############
+#######################################
+class Player(object):
+
+    def __init__(self, name):
+        self.name = name
+
+    def move(self):
+        inputs = input("Enter your position seperated by comma for example A,1: ")
+        input_list = inputs.split(',')
+        return input_list
+
+
 #######################################
 ########### Sets up the game ##########
 #######################################
@@ -208,7 +208,7 @@ def main():
     print("'e' represents an empty block and 's' represents a sealed block")
     myBoard = Board(player1,player2)
     myBoard.play()
-    #myBoard.board_visual()
+    myBoard.board_visual()
     #myBoard.testtest()
     #myBoard.board_visual()
 
