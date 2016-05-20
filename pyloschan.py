@@ -208,9 +208,65 @@ class Board(object):
 
     ### unlocks sealed spaces on upper levels
     def board_update(self):
-        if(A[0] != "e" and A[1] != "e" and B[0] != "e" and B[1] != "e" and E[0] == "s"):  #unlocks E1
+        ### LEVEL 1 ###
+        if(A[0] != "e" and A[1] != "e" and B[0] != "e" and B[1] != "e" and E[0] == "s"):  #unseals E0
             E[0] = "e"
-
+        elif(A[0] == "e" or A[1] == "e" or B[0] == "e" or B[1] == "e" and E[0] == "e"): #makes E0 sealed again
+            E[0] = "s"
+        if(A[1] != "e" and A[2] != "e" and B[1] != "e" and B[2] != "e" and E[1] == "s"):  #unseals E1
+            E[1] = "e"
+        elif(A[1] == "e" or A[2] == "e" or B[1] == "e" or B[2] == "e" and E[1] == "e"): #makes E1 sealed again
+            E[1] = "s"
+        if(A[2] != "e" and A[3] != "e" and B[2] != "e" and B[3] != "e" and E[2] == "s"):  #unseals E2
+            E[2] = "e"
+        elif(A[2] == "e" or A[3] == "e" or B[2] == "e" or B[3] == "e" and E[2] == "e"): #makes E2 sealed again
+            E[2] = "s"
+        if(B[0] != "e" and B[1] != "e" and C[0] != "e" and C[1] != "e" and F[0] == "s"):  #unseals F0
+            F[0] = "e"
+        elif(B[0] == "e" or B[1] == "e" or C[0] == "e" or C[1] == "e" and F[0] == "e"): #makes F0 sealed again
+            F[0] = "s"
+        if(B[1] != "e" and B[2] != "e" and C[1] != "e" and C[2] != "e" and F[1] == "s"):  #unseals F1
+            F[1] = "e"
+        elif(B[1] == "e" or B[2] == "e" or C[1] == "e" or C[2] == "e" and F[1] == "e"): #makes F1 sealed again
+            F[1] = "s"
+        if(B[2] != "e" and B[3] != "e" and C[2] != "e" and C[3] != "e" and F[2] == "s"):  #unseals F2
+            F[2] = "e"
+        elif(B[2] == "e" or B[3] == "e" or C[2] == "e" or C[3] == "e" and F[2] == "e"): #makes F2 sealed again
+            F[2] = "s"
+        if(C[0] != "e" and C[1] != "e" and D[0] != "e" and D[1] != "e" and G[0] == "s"):  #unseals G0
+            G[0] = "e"
+        elif(C[0] == "e" or C[1] == "e" or D[0] == "e" or D[1] == "e" and G[0] == "e"): #makes G0 sealed again
+            G[0] = "s"
+        if(C[1] != "e" and C[2] != "e" and D[1] != "e" and D[2] != "e" and G[1] == "s"):  #unseals G1
+            G[1] = "e"
+        elif(C[1] == "e" or C[2] == "e" or D[1] == "e" or D[2] == "e" and G[1] == "e"): #makes G1 sealed again
+            G[1] = "s"
+        if(C[2] != "e" and C[3] != "e" and D[2] != "e" and D[3] != "e" and G[2] == "s"):  #unseals G2
+            G[2] = "e"
+        elif(C[2] == "e" or C[3] == "e" or D[2] == "e" or D[3] == "e" and G[1] == "e"): #makes G2 sealed again
+            G[2] = "s"
+        ### LEVEL 2 ###
+        if(E[0] != "e" and E[1] != "e" and F[0] != "e" and F[1] != "e" and H[0] == "s"):  #unseals H0
+            H[0] = "e"
+        elif(E[0] == "e" or E[1] == "e" or F[0] == "e" or F[1] == "e" and H[0] == "e"): #makes H0 sealed again
+            H[0] = "s"
+        if(E[1] != "e" and E[2] != "e" and F[1] != "e" and F[2] != "e" and H[1] == "s"):  #unseals H1
+            H[1] = "e"
+        elif(E[1] == "e" or E[2] == "e" or F[2] == "e" or F[2] == "e" and H[1] == "e"): #makes H1 sealed again
+            H[1] = "s"
+        if(F[0] != "e" and F[1] != "e" and G[0] != "e" and G[1] != "e" and I[0] == "s"):  #unseals I0
+            I[0] = "e"
+        elif(F[0] == "e" or F[1] == "e" or G[0] == "e" or G[1] == "e" and I[0] == "e"): #makes I0 sealed again
+            I[0] = "s"
+        if(F[1] != "e" and F[2] != "e" and G[1] != "e" and G[2] != "e" and I[1] == "s"):  #unseals I1
+            I[1] = "e"
+        elif(F[1] == "e" or F[2] == "e" or G[1] == "e" or G[2] == "e" and I[1] == "e"): #makes I1 sealed again
+            I[1] = "s"
+        ### LEVEL 3 ###
+        if(H[0] != "e" and H[1] != "e" and I[0] != "e" and I[1] != "e" and J[0] == "s"):  #unseals J0
+            J[0] = "e"
+        elif(H[0] == "e" or H[1] == "e" or I[0] == "e" or I[1] == "e" and J[0] == "e"): #makes J0 sealed again
+            J[0] = "s"
 
 
 #######################################
