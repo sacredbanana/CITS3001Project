@@ -68,10 +68,14 @@ class Board(object):
                 if self.place(str(input_list[0]),  int(input_list[1]), "b"):
                     self.blackpieces -= 1
                     player = switchPlayer(player)
+            if (J[0] == "b"):
+                self.win(switchPlayer(player))
+                break
+            elif(J[0] == "w"):
+                print("white won?")
 
-
-        def win(self,player):
-            print(player.name + " won!")
+    def win(self,player):
+        print(player.name + " won!")
 
     def board_visual(self):
         print("Level: 0     Level: 1   Level: 2  Level: 3")
@@ -207,6 +211,7 @@ class Board(object):
             return False
 
     ### unlocks sealed spaces on upper levels
+    ### TODO: theres a bug in the code which needs fixing, with level 2 and above tht makes them e when they are supposed to be s
     def board_update(self):
         ### LEVEL 1 ###
         if(A[0] != "e" and A[1] != "e" and B[0] != "e" and B[1] != "e" and E[0] == "s"):  #unseals E0
