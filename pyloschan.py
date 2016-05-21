@@ -63,13 +63,25 @@ class Board(object):
             if player is self.white:
                 if self.place(str(input_list[0]),  int(input_list[1]), "w"):
                     self.whitepieces -= 1  # minus one piece from player
+                    if self.checkRemove():
+                        print("Please remove 1 piece")
+                        self.board_update()
+                        self.board_visual()
+                        input_list = player.move()
+                        if self.removep(str(input_list[0]),  int(input_list[1]), "b"):
+                            self.whitepieces += 1 # ++ one piece after removing one off board
                     player = switchPlayer(player)
-                    self.checkRemove()
             else:
                 if self.place(str(input_list[0]),  int(input_list[1]), "b"):
                     self.blackpieces -= 1  # minus one piece from player
+                    if self.checkRemove():
+                        print("Please remove 1 piece")
+                        self.board_update()
+                        self.board_visual()
+                        input_list = player.move()
+                        if self.removep(str(input_list[0]),  int(input_list[1]), "w"):
+                            self.blackpieces += 1 # ++ one piece after removing one off board
                     player = switchPlayer(player)
-                    self.checkRemove()
             if (J[0] == "b"):
                 self.win(switchPlayer(player))
                 break
@@ -212,6 +224,20 @@ class Board(object):
             print("Invalid input, please check if your position is a valid input.")
             return False
 
+    ### removes a piece ###
+    def removep(self, letter, position, piece):
+        if letter == "A":
+            if A[position] != "q" or A[position] != "v" or A[position] == piece:
+                A[position] = "e"
+                return True
+            elif A[position] == "e":
+                print("Position is empty.")
+                return False
+            else:
+                print("You cannot remove that piece")
+                return False
+
+
     ### unlocks sealed spaces on upper levels
     ### TODO: theres a bug in the code which needs fixing, with level 2 and above tht makes them e when they are supposed to be s
     def board_update(self):
@@ -275,20 +301,47 @@ class Board(object):
         elif(H[0] == "e" or H[1] == "e" or I[0] == "e" or I[1] == "e" and J[0] == "e"): #makes J0 sealed again
             J[0] = "s"
 
+    # Checks if a piece needs to be removed
+    # Returns True if yes a piece needs to be removed
     def checkRemove(self):
         ### LEVEL 1 ###
-        if(A[0] == A[1] == A[2] == A[3]):
+        if(A[0] != "e"):
+            if(A[0] == A[1] == A[2] == A[3]):
+                return True
+            if(A[0] == B[0] == C[0] == D[0]):
+                return True
+            if(A[0] == A[1] == B[0] == B[1]):
+                return True
+        if(C[0] != "e"):
+            if(C[0] == C[1] == C[2] == C[3]):
+                return True
+            if(C[0] == C[1] == B[0] == B[1]):
+                return True
+            if(C[0] == C[1] == D[0] == D[1]):
+                return True
+        if(B[2] != "e"):
+            if(B[0] == B[1] == B[2] == B[3]):
+                return True
+            if(A[1] == A[2] == B[1] == B[2]):
+                return True
+            if(C[1] == C[2] == B[1] == B[2]):
+                return True
+            if(A[2] == B[2] == C[2] == D[2] and A[2] != "e"):
+                return True
+            if(A[2] == A[3] == B[2] == B[3]):
+                return True
+            if(C[2] == C[3] == B[2] == B[3]):
+                return True
+        if(D[0] == D[1] == D[2] == D[3] and D[0] != "e"):
             return True
-        if(B[0] == B[1] == B[2] == B[3]):
+        if(A[1] == B[1] == C[1] == D[1] and A[1] != "e"):
             return True
-        if(C[0] == C[1] == C[2] == C[3]):
+        if(A[3] == B[3] == C[3] == D[3] and A[3] != "e"):
             return True
-        if(D[0] == D[1] == D[2] == D[3]):
+        if(C[1] == C[2] == D[1] == D[2] and C[1] != "e"):
             return True
-        if(A[0] == B[0] == C[0] == D[0]):
+        if(C[2] == C[3] == D[2] == D[3] and C[2] != "e"):
             return True
-
-
 
 #######################################
 ############ Class: Player ############
@@ -303,8 +356,6 @@ class Player(object):
         input_list = inputs.split(',')
         return input_list
 
-    def remove(self):
-        inputs = input("Enter the position of stones you wish to remove")
 
 
 #######################################
