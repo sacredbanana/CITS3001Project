@@ -64,29 +64,36 @@ class Board(object):
                 if self.place(str(input_list[0]),  int(input_list[1]), "w"):
                     self.whitepieces -= 1  # minus one piece from player
                     if self.checkRemove():
-                        print("Please remove 1 piece")
-                        self.board_update()
-                        self.board_visual()
-                        input_list = player.move()
-                        if self.removep(str(input_list[0]),  int(input_list[1]), "b"):
-                            self.whitepieces += 1 # ++ one piece after removing one off board
+                        while True:
+                            print("Please remove 1 piece")
+                            self.board_update()
+                            self.board_visual()
+                            input_list = player.move()
+                            if self.removep(str(input_list[0]),  int(input_list[1]), "b"):
+                                self.whitepieces += 1 # ++ one piece after removing one off board
+                                break
                     player = switchPlayer(player)
             else:
                 if self.place(str(input_list[0]),  int(input_list[1]), "b"):
                     self.blackpieces -= 1  # minus one piece from player
                     if self.checkRemove():
-                        print("Please remove 1 piece")
-                        self.board_update()
-                        self.board_visual()
-                        input_list = player.move()
-                        if self.removep(str(input_list[0]),  int(input_list[1]), "w"):
-                            self.blackpieces += 1 # ++ one piece after removing one off board
+                        while True:
+                            print("Please remove 1 piece")
+                            self.board_update()
+                            self.board_visual()
+                            input_list = player.move()
+                            if self.removep(str(input_list[0]),  int(input_list[1]), "w"):
+                                self.blackpieces += 1 # ++ one piece after removing one off board
+                                break
+                            else:
+                                print("Error input.")
                     player = switchPlayer(player)
             if (J[0] == "b"):
                 self.win(switchPlayer(player))
                 break
             elif(J[0] == "w"):
-                print("white won?")
+                self.win(switchPlayer(player))
+                break
 
     def win(self,player):
         print(player.name + " won!")
@@ -149,64 +156,67 @@ class Board(object):
         print("|\n")
         ####################################################
 
+    # Places piece on position
+    # @returns True if piece is successfully placed on position
+    # @returns False if position is occupied or input was out of bound
     def place(self, letter, position, piece):
-        if letter == "A" and position >= 0 and position <= 3:
+        if letter == "A" and 0 <= position <= 3:
             if A[position] == "e":
                 A[position] = piece
                 return True
             else:
                 print("position not empty.")
                 return False
-        elif letter == "B" and position >= 0 and position <= 3:
+        elif letter == "B" and 0 <= position <= 3:
             if B[position] == "e":
                 B[position] = piece
                 return True
             else:
                 print("position not empty.")
                 return False
-        elif letter == "C" and position >= 0 and position <= 3:
+        elif letter == "C" and 0 <= position <= 3:
             if C[position] == "e":
                 C[position] = piece
                 return True
             else:
                 print("position not empty.")
                 return False
-        elif letter == "D" and position >= 0 and position <= 3:
+        elif letter == "D" and 0 <= position <= 3:
             if D[position] == "e":
                 D[position] = piece
                 return True
             else:
                 print("position not empty.")
                 return False
-        elif letter == "E" and position >= 0 and position <= 2:
+        elif letter == "E" and 0 <= position <= 2:
             if E[position] == "e":
                 E[position] = piece
                 return True
             else:
                 print("position not empty.")
                 return False
-        elif letter == "F" and position >= 0 and position <= 2:
+        elif letter == "F" and 0 <= position <= 2:
             if F[position] == "e":
                 F[position] = piece
                 return True
             else:
                 print("position not empty.")
                 return False
-        elif letter == "G" and position >= 0 and position <= 2:
+        elif letter == "G" and 0 <= position <= 2:
             if G[position] == "e":
                 G[position] = piece
                 return True
             else:
                 print("position not empty.")
                 return False
-        elif letter == "H" and position >= 0 and position <= 1:
+        elif letter == "H" and 0 <= position <= 1:
             if H[position] == "e":
                 H[position] = piece
                 return True
             else:
                 print("position not empty.")
                 return False
-        elif letter == "I" and position >= 0 and position <= 1:
+        elif letter == "I" and 0 <= position <= 1:
             if I[position] == "e":
                 I[position] = piece
                 return True
@@ -227,16 +237,45 @@ class Board(object):
     ### removes a piece ###
     def removep(self, letter, position, piece):
         if letter == "A":
-            if A[position] != "q" or A[position] != "v" or A[position] == piece:
-                A[position] = "e"
-                return True
-            elif A[position] == "e":
+            if A[position] == "e":
                 print("Position is empty.")
                 return False
+            elif A[position] != "q" and A[position] != "v" and A[position] == piece:
+                A[position] = "e"
+                return True
             else:
                 print("You cannot remove that piece")
                 return False
-
+        if letter == "B":
+            if B[position] == "e":
+                print("Position is empty.")
+                return False
+            elif B[position] != "q" and B[position] != "v"and B[position] == piece:
+                B[position] = "e"
+                return True
+            else:
+                print("You cannot remove that piece")
+                return False
+        if letter == "C":
+            if C[position] == "e":
+                print("Position is empty.")
+                return False
+            elif C[position] != "q" and C[position] != "v"and C[position] == piece:
+                C[position] = "e"
+                return True
+            else:
+                print("You cannot remove that piece")
+                return False
+        if letter == "D":
+            if D[position] == "e":
+                print("Position is empty.")
+                return False
+            elif D[position] != "q" and D[position] != "v"and D[position] == piece:
+                D[position] = "e"
+                return True
+            else:
+                print("You cannot remove that piece")
+                return False
 
     ### unlocks sealed spaces on upper levels
     ### TODO: theres a bug in the code which needs fixing, with level 2 and above tht makes them e when they are supposed to be s
