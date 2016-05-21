@@ -60,18 +60,24 @@ class Board(object):
                 print(str(self.blackpieces) + " pieces left")
             #Get player's move Z[0,0]
             input_list = player.move()
-            if player is self.white: # minus one piece from player
+            if player is self.white:
                 if self.place(str(input_list[0]),  int(input_list[1]), "w"):
-                    self.whitepieces -= 1
+                    self.whitepieces -= 1  # minus one piece from player
                     player = switchPlayer(player)
+                    self.checkRemove()
             else:
                 if self.place(str(input_list[0]),  int(input_list[1]), "b"):
-                    self.blackpieces -= 1
+                    self.blackpieces -= 1  # minus one piece from player
                     player = switchPlayer(player)
+                    self.checkRemove()
+            if (J[0] == "b"):
+                self.win(switchPlayer(player))
+                break
+            elif(J[0] == "w"):
+                print("white won?")
 
-
-        def win(self,player):
-            print(player.name + " won!")
+    def win(self,player):
+        print(player.name + " won!")
 
     def board_visual(self):
         print("Level: 0     Level: 1   Level: 2  Level: 3")
@@ -207,6 +213,7 @@ class Board(object):
             return False
 
     ### unlocks sealed spaces on upper levels
+    ### TODO: theres a bug in the code which needs fixing, with level 2 and above tht makes them e when they are supposed to be s
     def board_update(self):
         ### LEVEL 1 ###
         if(A[0] != "e" and A[1] != "e" and B[0] != "e" and B[1] != "e" and E[0] == "s"):  #unseals E0
@@ -268,6 +275,20 @@ class Board(object):
         elif(H[0] == "e" or H[1] == "e" or I[0] == "e" or I[1] == "e" and J[0] == "e"): #makes J0 sealed again
             J[0] = "s"
 
+    def checkRemove(self):
+        ### LEVEL 1 ###
+        if(A[0] == A[1] == A[2] == A[3]):
+            return True
+        if(B[0] == B[1] == B[2] == B[3]):
+            return True
+        if(C[0] == C[1] == C[2] == C[3]):
+            return True
+        if(D[0] == D[1] == D[2] == D[3]):
+            return True
+        if(A[0] == B[0] == C[0] == D[0]):
+            return True
+
+
 
 #######################################
 ############ Class: Player ############
@@ -278,9 +299,12 @@ class Player(object):
         self.name = name
 
     def move(self):
-        inputs = input("Enter your position seperated by comma for example A,1: ")
+        inputs = input("Enter position seperated by comma for example A,1: ")
         input_list = inputs.split(',')
         return input_list
+
+    def remove(self):
+        inputs = input("Enter the position of stones you wish to remove")
 
 
 #######################################
