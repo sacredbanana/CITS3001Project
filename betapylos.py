@@ -4,7 +4,7 @@
 class Board(object):
 
     def __init__(self, player1, player2):  # player1 begins the game, player1 is white
-        self.whitepieces = 1
+        self.whitepieces = 7
         self.blackpieces = 7
         self.white = player1  # white
         self.black = player2  # black
@@ -32,11 +32,14 @@ class Board(object):
             "G": ["e","e","e"],
             "H": ["s","s"],
             "I": ["s","s"],
-            "J": ["s"]
+            "J": ["s"],
+            "Z": ["e"]
         }
 
         global board_list
         board_list = simple_board
+        global rp
+        rp = "p"
 
     # Visualises the board by printing out the values
     def board_visual(self):
@@ -46,6 +49,8 @@ class Board(object):
         print(board_list["F"], "   ", board_list["I"])
         print(board_list["G"])
 
+    # Updates the board but unsealing positions on higher levels
+    # or sealing them based on bottom positions
     def board_update(self):
         # Unseals J[0]
         if board_list["J"][0] == "s":
@@ -78,6 +83,15 @@ class Board(object):
             if v == "e" or w == "e" or v == "s" or w == "s":
                 board_list["I"][1] = "s"
 
+    # Checks if a piece needs to be removed
+    # @Returns True if a piece needs to be removed
+    # @Returns False if otherwise
+    def rcheck(self):
+        if board_list["E"][0] != "s" or board_list["E"][0] != "e":
+            if board_list["E"][0] == board_list["E"][1] == board_list["E"][2]:
+                return True
+        return False
+
     # Places piece on position
     # @returns True if successful
     # @returns False if otherwise
@@ -90,9 +104,23 @@ class Board(object):
                 print("Position is not empty.")
                 return False
         except:
-            print("Invalid input, please check your input is correct.")
+            print("Invalid input, please check your input is correct.111")
             return False
 
+    # Raises a piece from position2 to position
+    # Destination = letter2
+    # From = letter
+    # @Returns True if raise is successful
+    # @Returns False if otherwise
+    def raisep(self, letter, position, piece, letter2, position2):
+        if self.checklevel(letter2, letter) and self.removep(letter2, position2, piece) and self.place(letter, position, piece):
+            return True
+        else:
+            return False
+
+    # Removes a piece from position
+    # @returns True if remove is successful
+    # @returns False if otherwise
     def removep(self, letter, position, piece):
         try:
             if board_list[letter][position] == piece:
@@ -102,13 +130,37 @@ class Board(object):
                 print("You cannot remove from that position.")
                 return False
         except:
-            print("Invalid input, please check your input is correct.")
+            print("Invalid input, please check your input is correct.222")
             return False
 
-    def raise(self, letter, position, piece, letter2, position2):
-        self.removep(letter2, position2, piece)
-        self.place(letter, position, piece)
-
+    # Checks the level of different coordinates
+    # @Returns True if level is lower level 2
+    #   for example True for level = A and level 2 = E
+    # @Returns False if level is above level 2
+    def checklevel(self, letter, letter2):
+        num = 0
+        num2 = 0
+        if letter in ("E", "F", "G"):
+            num = 1
+        elif letter in ("H", "I"):
+            num = 2
+        else:
+            print("Invalid input.")
+            return False
+        if letter2 in ("E", "F", "G"):
+            num2 = 1
+        elif letter2 in ("H", "I"):
+            num2 = 2
+        else:
+            print("Invalid input.")
+            return False
+        num3 = num2 - num
+        if num3 > 0:
+            print("Piece from " + letter + " raised to " + letter2)
+            return True
+        else:
+            print("You can only raise pieces to an upper level.")
+            return False
 
     # Play function that runs the game
     def play(self):
@@ -135,20 +187,38 @@ class Board(object):
                     self.win(switchPlayer(player))
                     break
             input_list = player.move()
-            try:
-                i = str(input_list[0])
-                j = int(input_list[1])
-            except:
-                print("Invalid input.")
-                continue
-            if player is self.white:
-                if self.place(i, j, "w"):
-                    self.whitepieces -= 1
-                    player = switchPlayer(player)
+            #If you just want to place a piece
+            if len(input_list) == 2:
+                try:
+                    i = str(input_list[0])
+                    j = int(input_list[1])
+                except:
+                    print("Invalid input.")
+                    continue
+                if player is self.white:
+                    if self.place(i, j, "w"):
+                        self.whitepieces -= 1
+                        player = switchPlayer(player)
+                else:
+                    if self.place(i, j, "b"):
+                        self.blackpieces -= 1
+                        player = switchPlayer(player)
+            # if you want to raise a piece
             else:
-                if self.place(i, j, "b"):
-                    self.blackpieces -= 1
-                    player = switchPlayer(player)
+                try:
+                    i = str(input_list[0])
+                    j = int(input_list[1])
+                    x = str(input_list[2])
+                    y = int(input_list[3])
+                except:
+                    print("Invalid input.")
+                    continue
+                if player is self.white:
+                    if self.raisep(i, j, "w", x, y):
+                        player = switchPlayer(player)
+                else:
+                    if self.raisep(i, j, "b", x, y):
+                        player = switchPlayer(player)
             # You win by placing your piece on the top-most position
             if board_list["J"][0] == "b":
                 self.win(switchPlayer(player))
