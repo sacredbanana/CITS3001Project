@@ -38,8 +38,6 @@ class Board(object):
 
         global board_list
         board_list = simple_board
-        global rp
-        rp = "p"
 
     # Visualises the board by printing out the values
     def board_visual(self):
@@ -86,8 +84,9 @@ class Board(object):
     # Checks if a piece needs to be removed
     # @Returns True if a piece needs to be removed
     # @Returns False if otherwise
+    # TODO
     def rcheck(self):
-        if board_list["E"][0] != "s" or board_list["E"][0] != "e":
+        if board_list["E"][0] != "s" and board_list["E"][0] != "e":
             if board_list["E"][0] == board_list["E"][1] == board_list["E"][2]:
                 return True
         return False
@@ -95,7 +94,7 @@ class Board(object):
     # Places piece on position
     # @returns True if successful
     # @returns False if otherwise
-    def place(self, letter, position, piece):
+    def place(self, letter, position, piece, boardlist, piecenumber):
         try:
             if board_list[letter][position] == "e":
                 board_list[letter][position] = piece
@@ -112,8 +111,8 @@ class Board(object):
     # From = letter
     # @Returns True if raise is successful
     # @Returns False if otherwise
-    def raisep(self, letter, position, piece, letter2, position2):
-        if self.checklevel(letter2, letter) and self.removep(letter2, position2, piece) and self.place(letter, position, piece):
+    def raisep(self, letter, position, piece, letter2, position2, boardlist, piecenumber):
+        if self.checklevel(letter2, letter) and self.removep(letter2, position2, piece, boardlist, piecenumber) and self.place(letter, position, piece, boardlist, piecenumber):
             return True
         else:
             return False
@@ -121,7 +120,7 @@ class Board(object):
     # Removes a piece from position
     # @returns True if remove is successful
     # @returns False if otherwise
-    def removep(self, letter, position, piece):
+    def removep(self, letter, position, piece, boardlist, piecenumber):
         try:
             if board_list[letter][position] == piece:
                 board_list[letter][position] = "e"
@@ -151,12 +150,17 @@ class Board(object):
             num2 = 1
         elif letter2 in ("H", "I"):
             num2 = 2
+        elif letter2 == "Z":
+            num2 = 4
         else:
             print("Invalid input.")
             return False
         num3 = num2 - num
         if num3 > 0:
-            print("Piece from " + letter + " raised to " + letter2)
+            if letter2 == "Z":
+                print("Piece removed from "+ letter)
+            else:
+                print("Piece from " + letter + " raised to " + letter2)
             return True
         else:
             print("You can only raise pieces to an upper level.")
@@ -174,58 +178,85 @@ class Board(object):
 
         while True:
             self.board_visual()
-            # Tell player it's their turn
-            print(player.name + "'s move, you have ", end="")
-            if player is self.white:
-                print(str(self.whitepieces) + " pieces left")
-                if self.whitepieces == 0:  # if you have 0 pieces the other player wins
-                    self.win(switchPlayer(player))
-                    break
-            else:
-                print(str(self.blackpieces) + " pieces left")
-                if self.blackpieces == 0:  # if you have 0 pieces the other player wins
-                    self.win(switchPlayer(player))
-                    break
-            input_list = player.move()
-            #If you just want to place a piece
-            if len(input_list) == 2:
+            if self.rcheck():
+                player = switchPlayer(player)
+                 # Tell player it's their turn
+                print(player.name + "'s move please remove a piece.")
+                if player is self.white:
+                    input_list = player.move(board_list, self.whitepieces)
+                else:
+                    input_list = player.move(board_list, self.blackpieces)
                 try:
                     i = str(input_list[0])
                     j = int(input_list[1])
                 except:
                     print("Invalid input.")
+                    player = switchPlayer(player)
                     continue
                 if player is self.white:
-                    if self.place(i, j, "w"):
-                        self.whitepieces -= 1
+                    if self.raisep("Z", 0, "w", i, j, board_list, self.whitepieces):
+                        self.whitepieces += 1
+                        print(player.name + " now has " + str(self.whitepieces) + " pieces left.")
                         player = switchPlayer(player)
                 else:
-                    if self.place(i, j, "b"):
-                        self.blackpieces -= 1
+                    if self.raisep("Z", 0, "b", i, j, board_list, self.blackpieces):
+                        self.blackpieces += 1
+                        print(player.name + " now has " + str(self.blackpieces) + " pieces left.")
                         player = switchPlayer(player)
-            # if you want to raise a piece
             else:
-                try:
-                    i = str(input_list[0])
-                    j = int(input_list[1])
-                    x = str(input_list[2])
-                    y = int(input_list[3])
-                except:
-                    print("Invalid input.")
-                    continue
+                # Tell player it's their turn
+                print(player.name + "'s move, you have ", end="")
                 if player is self.white:
-                    if self.raisep(i, j, "w", x, y):
-                        player = switchPlayer(player)
+                    print(str(self.whitepieces) + " pieces left")
+                    if self.whitepieces == 0:  # if you have 0 pieces the other player wins
+                        self.win(switchPlayer(player))
+                        break
+                    input_list = player.move(board_list, self.whitepieces)
                 else:
-                    if self.raisep(i, j, "b", x, y):
-                        player = switchPlayer(player)
-            # You win by placing your piece on the top-most position
-            if board_list["J"][0] == "b":
-                self.win(switchPlayer(player))
-                break
-            elif board_list["J"][0] == "w":
-                self.win(switchPlayer(player))
-                break
+                    print(str(self.blackpieces) + " pieces left")
+                    if self.blackpieces == 0:  # if you have 0 pieces the other player wins
+                        self.win(switchPlayer(player))
+                        break
+                    input_list = player.move(board_list, self.blackpieces)
+                # If you just want to place a piece
+                if len(input_list) == 2:
+                    try:
+                        i = str(input_list[0])
+                        j = int(input_list[1])
+                    except:
+                        print("Invalid input.")
+                        continue
+                    if player is self.white:
+                        if self.place(i, j, "w", board_list, self.whitepieces):
+                            self.whitepieces -= 1
+                            player = switchPlayer(player)
+                    else:
+                        if self.place(i, j, "b", board_list, self.blackpieces):
+                            self.blackpieces -= 1
+                            player = switchPlayer(player)
+                # if you want to raise a piece
+                else:
+                    try:
+                        i = str(input_list[0])
+                        j = int(input_list[1])
+                        x = str(input_list[2])
+                        y = int(input_list[3])
+                    except:
+                        print("Invalid input.")
+                        continue
+                    if player is self.white:
+                        if self.raisep(i, j, "w", x, y, board_list, self.whitepieces):
+                            player = switchPlayer(player)
+                    else:
+                        if self.raisep(i, j, "b", x, y, board_list, self.blackpieces):
+                            player = switchPlayer(player)
+                # You win by placing your piece on the top-most position
+                if board_list["J"][0] == "b":
+                    self.win(switchPlayer(player))
+                    break
+                elif board_list["J"][0] == "w":
+                    self.win(switchPlayer(player))
+                    break
 
     def win(self,player):
         print(player.name + " won!")
@@ -239,7 +270,7 @@ class Player(object):
     def __init__(self, name):
         self.name = name
 
-    def move(self):
+    def move(self, boardlist, piecenumber):
         inputs = input("Enter position seperated by comma for example A,1: ")
         input_list = inputs.split(',')
         return input_list
@@ -262,7 +293,6 @@ def main():
     print("'e' represents an empty block and 's' represents a sealed block")
     myBoard = Board(player1, player2)
     myBoard.play()
-    myBoard.board_visual()
 
 
 
