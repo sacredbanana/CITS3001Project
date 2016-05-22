@@ -86,8 +86,29 @@ class Board(object):
     # @Returns False if otherwise
     # TODO
     def rcheck(self):
+        num = 0
         if board_list["E"][0] != "s" and board_list["E"][0] != "e":
             if board_list["E"][0] == board_list["E"][1] == board_list["E"][2]:
+                return True
+            if board_list["E"][0] == board_list["F"][0] == board_list["G"][0]:
+                return True
+        if board_list["F"][1] != "s" and board_list["F"][1] != "e":
+            if board_list["F"][0] == board_list["F"][1] == board_list["F"][2]:
+                return True
+            if board_list["E"][1] == board_list["F"][1] == board_list["G"][1]:
+                return True
+            if board_list["F"][0] == board_list["F"][1] == board_list["G"][0] == board_list["G"][1]:
+                return True
+            if board_list["F"][1] == board_list["F"][2] == board_list["G"][1] == board_list["G"][2]:
+                return True
+            if board_list["E"][0] == board_list["E"][1] == board_list["F"][0] == board_list["F"][1]:
+                return True
+            if board_list["E"][1] == board_list["E"][2] == board_list["F"][1] == board_list["F"][2]:
+                return True
+        if board_list["G"][2] != "s" and board_list["G"][2] != "e":
+            if board_list["G"][0] == board_list["G"][1] == board_list["G"][2]:
+                return True
+            if board_list["E"][2] == board_list["F"][2] == board_list["G"][2]:
                 return True
         return False
 
