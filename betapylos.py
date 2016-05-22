@@ -39,6 +39,9 @@ class Board(object):
         global board_list
         board_list = simple_board
 
+        global last_move
+        last_move = ["Z", 0]
+
     # Visualises the board by printing out the values
     def board_visual(self):
         self.board_update()
@@ -84,32 +87,61 @@ class Board(object):
     # Checks if a piece needs to be removed
     # @Returns True if a piece needs to be removed
     # @Returns False if otherwise
-    # TODO
-    def rcheck(self):
-        num = 0
-        if board_list["E"][0] != "s" and board_list["E"][0] != "e":
-            if board_list["E"][0] == board_list["E"][1] == board_list["E"][2]:
-                return True
-            if board_list["E"][0] == board_list["F"][0] == board_list["G"][0]:
-                return True
-        if board_list["F"][1] != "s" and board_list["F"][1] != "e":
-            if board_list["F"][0] == board_list["F"][1] == board_list["F"][2]:
-                return True
-            if board_list["E"][1] == board_list["F"][1] == board_list["G"][1]:
-                return True
-            if board_list["F"][0] == board_list["F"][1] == board_list["G"][0] == board_list["G"][1]:
-                return True
-            if board_list["F"][1] == board_list["F"][2] == board_list["G"][1] == board_list["G"][2]:
-                return True
-            if board_list["E"][0] == board_list["E"][1] == board_list["F"][0] == board_list["F"][1]:
-                return True
-            if board_list["E"][1] == board_list["E"][2] == board_list["F"][1] == board_list["F"][2]:
-                return True
-        if board_list["G"][2] != "s" and board_list["G"][2] != "e":
-            if board_list["G"][0] == board_list["G"][1] == board_list["G"][2]:
-                return True
-            if board_list["E"][2] == board_list["F"][2] == board_list["G"][2]:
-                return True
+    def rcheck(self, letter, position):
+        if board_list[letter][position] != "s" and board_list[letter][position] != "e":
+            if letter in ("E", "F", "G"):
+                if board_list["E"][position] == board_list["F"][position] == board_list["G"][position]:
+                    return True
+                if board_list[letter][0] == board_list[letter][1] == board_list[letter][2]:
+                    return True
+            if letter == "E":
+                if position == 0:
+                    if board_list["E"][0] == board_list["E"][1] == board_list["F"][0] == board_list["F"][1]:
+                        return True
+                if position == 2:
+                    if board_list["E"][1] == board_list["E"][2] == board_list["F"][1] == board_list["F"][2]:
+                        return True
+                if position == 1:
+                    if board_list["E"][0] == board_list["E"][1] == board_list["F"][0] == board_list["F"][1]:
+                        return True
+                    if board_list["E"][1] == board_list["E"][2] == board_list["F"][1] == board_list["F"][2]:
+                        return True
+            if letter == "F":
+                if position == 0:
+                    if board_list["E"][0] == board_list["E"][1] == board_list["F"][0] == board_list["F"][1]:
+                        return True
+                    if board_list["G"][0] == board_list["G"][1] == board_list["F"][0] == board_list["F"][1]:
+                        return True
+                if position == 2:
+                    if board_list["E"][1] == board_list["E"][2] == board_list["F"][1] == board_list["F"][2]:
+                        return True
+                    if board_list["G"][1] == board_list["G"][2] == board_list["F"][1] == board_list["F"][2]:
+                        return True
+                if position == 1:
+                    if board_list["E"][0] == board_list["E"][1] == board_list["F"][0] == board_list["F"][1]:
+                        return True
+                    if board_list["G"][0] == board_list["G"][1] == board_list["F"][0] == board_list["F"][1]:
+                        return True
+                    if board_list["E"][1] == board_list["E"][2] == board_list["F"][1] == board_list["F"][2]:
+                        return True
+                    if board_list["G"][1] == board_list["G"][2] == board_list["F"][1] == board_list["F"][2]:
+                        return True
+            if letter == "G":
+                if position == 0:
+                    if board_list["G"][0] == board_list["G"][1] == board_list["F"][0] == board_list["F"][1]:
+                        return True
+                if position == 2:
+                    if board_list["G"][1] == board_list["G"][2] == board_list["F"][1] == board_list["F"][2]:
+                        return True
+                if position == 1:
+                    if board_list["G"][0] == board_list["G"][1] == board_list["F"][0] == board_list["F"][1]:
+                        return True
+                    if board_list["G"][1] == board_list["G"][2] == board_list["F"][1] == board_list["F"][2]:
+                        return True
+            if letter in ("H", "I"):
+                if board_list["H"][0] == board_list["H"][1] == board_list["I"][0] == board_list["I"][1]:
+                    return True
+            return False
         return False
 
     # Places piece on position
@@ -198,8 +230,9 @@ class Board(object):
         player = self.white
 
         while True:
+            board_list["Z"][0] = "e"
             self.board_visual()
-            if self.rcheck():
+            if self.rcheck(last_move[0], last_move[1]):
                 player = switchPlayer(player)
                  # Tell player it's their turn
                 print(player.name + "'s move please remove a piece.")
@@ -218,12 +251,16 @@ class Board(object):
                     if self.raisep("Z", 0, "w", i, j, board_list, self.whitepieces):
                         self.whitepieces += 1
                         print(player.name + " now has " + str(self.whitepieces) + " pieces left.")
-                        player = switchPlayer(player)
+                        last_move[0] = i
+                        last_move[1] = j
                 else:
                     if self.raisep("Z", 0, "b", i, j, board_list, self.blackpieces):
                         self.blackpieces += 1
                         print(player.name + " now has " + str(self.blackpieces) + " pieces left.")
-                        player = switchPlayer(player)
+                        last_move[0] = i
+                        last_move[1] = j
+                player = switchPlayer(player)
+                print(last_move)
             else:
                 # Tell player it's their turn
                 print(player.name + "'s move, you have ", end="")
@@ -251,10 +288,14 @@ class Board(object):
                         if self.place(i, j, "w", board_list, self.whitepieces):
                             self.whitepieces -= 1
                             player = switchPlayer(player)
+                            last_move[0] = i
+                            last_move[1] = j
                     else:
                         if self.place(i, j, "b", board_list, self.blackpieces):
                             self.blackpieces -= 1
                             player = switchPlayer(player)
+                            last_move[0] = i
+                            last_move[1] = j
                 # if you want to raise a piece
                 else:
                     try:
@@ -268,9 +309,13 @@ class Board(object):
                     if player is self.white:
                         if self.raisep(i, j, "w", x, y, board_list, self.whitepieces):
                             player = switchPlayer(player)
+                            last_move[0] = i
+                            last_move[1] = j
                     else:
                         if self.raisep(i, j, "b", x, y, board_list, self.blackpieces):
                             player = switchPlayer(player)
+                            last_move[0] = i
+                            last_move[1] = j
                 # You win by placing your piece on the top-most position
                 if board_list["J"][0] == "b":
                     self.win(switchPlayer(player))
