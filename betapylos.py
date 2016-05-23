@@ -407,10 +407,43 @@ class Player(object):
     def __init__(self, name):
         self.name = name
 
-    def move(self, boardlist, piecenumber):
+    def move(self, boardlist, mypiecenumber):
         inputs = input("Enter position seperated by comma for example A,1: ")
         input_list = inputs.split(',')
         return input_list
+
+#######################################
+############ Class: Machine ############
+#######################################
+class Machine(Player):
+
+    def move(self, boardlist, mypiecenumber):
+        i = self.anymove(boardlist)
+        print(i)
+        return i
+
+    def anymove(self, boardlist):
+        for i in boardlist["E"][:]:
+            if i == "e":
+                return ["E", boardlist["E"].index(i)]
+        for i in boardlist["F"][:]:
+            if i == "e":
+                return ["F", boardlist["F"].index(i)]
+        for i in boardlist["G"][:]:
+            if i == "e":
+                return ["G", boardlist["G"].index(i)]
+        for i in boardlist["H"][:]:
+            if i == "e":
+                return ["H", boardlist["H"].index(i)]
+        for i in boardlist["I"][:]:
+            if i == "e":
+                return ["I", boardlist["I"].index(i)]
+        if boardlist["J"][0] == "e":
+            return ["J", 0]
+        else:
+            print("something went wrong1")
+            return None
+
 
 
 #######################################
@@ -420,13 +453,15 @@ def main():
 
     print("Welcome to Pylos")
     player1 = input("Is player 1 (white) human or machine? (h or m) ")
-    if(player1=="h"): player1 = Player("White")
+    if(player1=="h"): player1 = Player("Human White")
     elif(player1=="m"): player1 = Machine("Machine White")
-    else: return
+    else:
+        return
     player2 = input("Is player 2 (black) human or machine? (h or m) ")
-    if(player2=="h"): player2 = Player("Black")
+    if(player2=="h"): player2 = Player("Human Black")
     elif(player2=="m"): player2 = Machine("Machine Black")
-    else: return
+    else:
+        return
     print("'e' represents an empty block and 's' represents a sealed block")
     myBoard = Board(player1, player2)
     myBoard.play()
