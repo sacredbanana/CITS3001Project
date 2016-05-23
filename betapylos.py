@@ -144,6 +144,9 @@ class Board(object):
             return False
         return False
 
+    # Checks if a position can be removed based on if any piece is on top of it
+    # @Returns True if no piece stands on top of the position
+    # @Returns False if a piece is stacked on top of the position
     def canremove(self, letter, position):
         if letter == "E":
             if position == 0:
@@ -202,6 +205,8 @@ class Board(object):
                 else:
                     print("There is a piece stacked on top.")
                     return False
+        elif letter in ("H", "I"):
+            return True
         else:
             return False
 
