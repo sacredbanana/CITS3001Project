@@ -144,6 +144,69 @@ class Board(object):
             return False
         return False
 
+    def canremove(self, letter, position):
+        if letter == "E":
+            if position == 0:
+                if board_list["H"][0] in ("s", "e"):
+                    return True
+                else:
+                    print("There is a piece stacked on top.")
+                    return False
+            if position == 1:
+                if board_list["H"][0] in ("s", "e") and board_list["H"][1] in ("s", "e"):
+                    return True
+                else:
+                    print("There is a piece stacked on top.")
+                    return False
+            if position == 2:
+                if board_list["H"][1] in ("s", "e"):
+                    return True
+                else:
+                    print("There is a piece stacked on top.")
+                    return False
+        elif letter == "F":
+            if position == 0:
+                if board_list["H"][0] in ("s", "e") and board_list["I"][0] in ("s", "e"):
+                    return True
+                else:
+                    print("There is a piece stacked on top.")
+                    return False
+            if position == 1:
+                if board_list["H"][0] in ("s", "e") and board_list["H"][1] in ("s", "e") and board_list["I"][0] in ("s", "e") and board_list["I"][1] in ("s", "e"):
+                    return True
+                else:
+                    print("There is a piece stacked on top.")
+                    return False
+            if position == 2:
+                if board_list["H"][1] in ("s", "e") and board_list["I"][1] in ("s", "e"):
+                    return True
+                else:
+                    print("There is a piece stacked on top.")
+                    return False
+        elif letter == "G":
+            if position == 0:
+                if board_list["I"][0] in ("s", "e"):
+                    return True
+                else:
+                    print("There is a piece stacked on top.")
+                    return False
+            if position == 1:
+                if board_list["I"][0] in ("s", "e") and board_list["I"][1] in ("s", "e"):
+                    return True
+                else:
+                    print("There is a piece stacked on top.")
+                    return False
+            if position == 2:
+                if board_list["I"][1] in ("s", "e"):
+                    return True
+                else:
+                    print("There is a piece stacked on top.")
+                    return False
+        else:
+            return False
+
+
+
     # Places piece on position
     # @returns True if successful
     # @returns False if otherwise
@@ -175,7 +238,7 @@ class Board(object):
     # @returns False if otherwise
     def removep(self, letter, position, piece, boardlist, piecenumber):
         try:
-            if board_list[letter][position] == piece:
+            if self.canremove(letter, position) and board_list[letter][position] == piece:
                 board_list[letter][position] = "e"
                 return True
             else:
@@ -211,7 +274,7 @@ class Board(object):
         num3 = num2 - num
         if num3 > 0:
             if letter2 == "Z":
-                print("Piece removed from "+ letter)
+                print("", end="")
             else:
                 print("Piece from " + letter + " raised to " + letter2)
             return True
@@ -232,9 +295,10 @@ class Board(object):
         while True:
             board_list["Z"][0] = "e"
             self.board_visual()
+            # removes pieces
             if self.rcheck(last_move[0], last_move[1]):
                 player = switchPlayer(player)
-                 # Tell player it's their turn
+                # Tell player it's their turn
                 print(player.name + "'s move please remove a piece.")
                 if player is self.white:
                     input_list = player.move(board_list, self.whitepieces)
@@ -250,12 +314,14 @@ class Board(object):
                 if player is self.white:
                     if self.raisep("Z", 0, "w", i, j, board_list, self.whitepieces):
                         self.whitepieces += 1
+                        print("Piece removed from " + i + "," + str(j))
                         print(player.name + " now has " + str(self.whitepieces) + " pieces left.")
                         last_move[0] = i
                         last_move[1] = j
                 else:
                     if self.raisep("Z", 0, "b", i, j, board_list, self.blackpieces):
                         self.blackpieces += 1
+                        print("Piece removed from " + i + "," + str(j))
                         print(player.name + " now has " + str(self.blackpieces) + " pieces left.")
                         last_move[0] = i
                         last_move[1] = j
