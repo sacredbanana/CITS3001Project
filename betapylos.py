@@ -434,7 +434,7 @@ class Machine(Player):
     def minimax(self, boardlist, side, mypiece, theirpiece, depth, beginscore):
         best = [None, None]
         movelist = self.moveList(boardlist)
-        if depth < 0:
+        if depth == 0:
             if side == 0:
                 best = [-math.inf, ["F", 1]]
                 for i in movelist:
@@ -477,6 +477,9 @@ class Machine(Player):
                         best[1] = i
         return best
 
+    # Generates possible move list based on game state
+    # stores the moves in a list, count
+    # @Returns count
     def moveList(self, boardlist):
         count = []
         for i, x in enumerate(boardlist["E"]):
@@ -498,29 +501,29 @@ class Machine(Player):
             if x == "e":
                 count.append(["J", i])
         return count
-    '''
-    def generatemove(self, boardlist):
-        for i in boardlist["E"][:]:
-            if i == "e":
-                return ["E", boardlist["E"].index(i)]
-        for i in boardlist["F"][:]:
-            if i == "e":
-                return ["F", boardlist["F"].index(i)]
-        for i in boardlist["G"][:]:
-            if i == "e":
-                return ["G", boardlist["G"].index(i)]
-        for i in boardlist["H"][:]:
-            if i == "e":
-                return ["H", boardlist["H"].index(i)]
-        for i in boardlist["I"][:]:
-            if i == "e":
-                return ["I", boardlist["I"].index(i)]
-        if boardlist["J"][0] == "e":
-            return ["J", 0]
-        else:
-            print("No more spots left")
-            return None
-    '''
+
+    # Generates  possible remove list based on game state
+    # stores the moves in a list, count
+    # @Returns count
+    def removeList(self, boardlist, piece):
+        count = []
+        for i, x in enumerate(boardlist["E"]):
+            if x == piece and self.mcanremove("E", i, boardlist):
+                count.append(["E", i])
+        for i, x in enumerate(boardlist["F"]):
+            if x == piece and self.mcanremove("F", i, boardlist):
+                count.append(["F", i])
+        for i, x in enumerate(boardlist["G"]):
+            if x == piece and self.mcanremove("G", i, boardlist):
+                count.append(["G", i])
+        for i, x in enumerate(boardlist["H"]):
+            if x == piece:
+                count.append(["H", i])
+        for i, x in enumerate(boardlist["I"]):
+            if x == piece:
+                count.append(["I", i])
+        return count
+
     # Places piece on position
     # @returns True if successful
     # @returns False if otherwise
@@ -646,6 +649,72 @@ class Machine(Player):
                     return True
             return False
         return False
+
+    # Checks if a position can be removed based on if any piece is on top of it
+    # @Returns True if no piece stands on top of the position
+    # @Returns False if a piece is stacked on top of the position
+    def mcanremove(self, letter, position, boardlist):
+        if letter == "E":
+            if position == 0:
+                if boardlist["H"][0] in ("s", "e"):
+                    return True
+                else:
+                    print("There is a piece stacked on top.")
+                    return False
+            if position == 1:
+                if boardlist["H"][0] in ("s", "e") and boardlist["H"][1] in ("s", "e"):
+                    return True
+                else:
+                    print("There is a piece stacked on top.")
+                    return False
+            if position == 2:
+                if boardlist["H"][1] in ("s", "e"):
+                    return True
+                else:
+                    print("There is a piece stacked on top.")
+                    return False
+        elif letter == "F":
+            if position == 0:
+                if boardlist["H"][0] in ("s", "e") and boardlist["I"][0] in ("s", "e"):
+                    return True
+                else:
+                    print("There is a piece stacked on top.")
+                    return False
+            if position == 1:
+                if boardlist["H"][0] in ("s", "e") and boardlist["H"][1] in ("s", "e") and boardlist["I"][0] in ("s", "e") and boardlist["I"][1] in ("s", "e"):
+                    return True
+                else:
+                    print("There is a piece stacked on top.")
+                    return False
+            if position == 2:
+                if boardlist["H"][1] in ("s", "e") and boardlist["I"][1] in ("s", "e"):
+                    return True
+                else:
+                    print("There is a piece stacked on top.")
+                    return False
+        elif letter == "G":
+            if position == 0:
+                if boardlist["I"][0] in ("s", "e"):
+                    return True
+                else:
+                    print("There is a piece stacked on top.")
+                    return False
+            if position == 1:
+                if boardlist["I"][0] in ("s", "e") and boardlist["I"][1] in ("s", "e"):
+                    return True
+                else:
+                    print("There is a piece stacked on top.")
+                    return False
+            if position == 2:
+                if boardlist["I"][1] in ("s", "e"):
+                    return True
+                else:
+                    print("There is a piece stacked on top.")
+                    return False
+        elif letter in ("H", "I"):
+            return True
+        else:
+            return False
 
     def evaluate(self, boardlist, letter, position, prevscore):
         score = prevscore
@@ -818,11 +887,123 @@ class Machine(Player):
 
         return score
 
+    def remevaluate(self, boardlist, letter, position, prevscore):
+        score = prevscore + 10
+        if self.mrcheck(letter, position, boardlist):
+            score += 3
+        if letter == "E":
+            if position == 0:
+                if boardlist["E"][0] != boardlist["E"][1] and boardlist["E"][1] not in ["s","e"]:
+                    if boardlist["E"][1] == boardlist["E"][2]:
+                        score -= 3
+                    if boardlist["E"][1] == boardlist["F"][1] == boardlist["E"][2]:
+                        score -= 3
+                if boardlist["E"][0] != boardlist["F"][1] and boardlist["F"][1] not in ["s","e"]:
+                    if boardlist["F"][1] == boardlist["F"][2]:
+                        score -=3
+            elif position == 1:
+                score -= 1
+                if boardlist["E"][1] != boardlist["E"][0] and boardlist["E"][0] not in ["s","e"]:
+                    if boardlist["E"][0] == boardlist["E"][2]:
+                        score -= 3
+                    if boardlist["E"][0] == boardlist["F"][0] == boardlist["F"][1]:
+                        score -= 3
+                if boardlist["E"][1] != boardlist["F"][1] and boardlist["F"][1] not in ["s","e"]:
+                    if boardlist["F"][1] == boardlist["G"][1]:
+                        score -= 3
+                    if boardlist["F"][1] == boardlist["F"][2] == boardlist["E"][2]:
+                        score -= 3
+            elif position == 2:
+                if boardlist["E"][2] != boardlist["E"][1] and boardlist["E"][1] not in ["s","e"]:
+                    if boardlist["E"][1] == boardlist["E"][0]:
+                        score -= 3
+                    if boardlist["E"][1] == boardlist["F"][1] == boardlist["F"][2]:
+                        score -= 3
+                if boardlist["E"][2] != boardlist["F"][2] and boardlist["F"][2] not in ["s","e"]:
+                    if boardlist["F"][2] == boardlist["G"][2]:
+                        score -= 3
+        elif letter == "F":
+            score -= 1
+            if position == 0:
+                if boardlist["F"][0] != boardlist["E"][0] and boardlist["E"][0] not in ["s","e"]:
+                    if boardlist["E"][0] == boardlist["G"][0]:
+                        score -= 3
+                    if boardlist["E"][0] == boardlist["E"][1] == boardlist["F"][1]:
+                        score -= 3
+                if boardlist["F"][0] != boardlist["F"][1] and boardlist["F"][1] not in ["s","e"]:
+                    if boardlist["F"][1] == boardlist["F"][2]:
+                        score -= 3
+                    if boardlist["F"][1] == boardlist["G"][1] == boardlist["G"][0]:
+                        score -= 3
+            elif position == 1:
+                score -= 1
+                if boardlist["F"][1] != boardlist["E"][1] and boardlist["E"][1] not in ["s","e"]:
+                    if boardlist["E"][1] == boardlist["G"][1]:
+                        score -= 3
+                    if boardlist["E"][1] == boardlist["E"][0] == boardlist["F"][0]:
+                        score -= 3
+                    if boardlist["E"][1] == boardlist["E"][2] == boardlist["F"][2]:
+                        score -= 3
+                if boardlist["F"][1] != boardlist["F"][2] and boardlist["F"][2] not in ["s","e"]:
+                    if boardlist["F"][2] == boardlist["F"][0]:
+                        score -= 3
+                    if boardlist["F"][2] == boardlist["G"][2] == boardlist["G"][1]:
+                        score -= 3
+                if boardlist["F"][1] != boardlist["G"][1] and boardlist["G"][1] not in ["s","e"]:
+                    if boardlist["G"][1] == boardlist["G"][0] == boardlist["F"][0]:
+                        score -= 3
+            elif position == 2:
+                if boardlist["F"][2] != boardlist["E"][2] and boardlist["E"][2] not in ["s","e"]:
+                    if boardlist["E"][2] == boardlist["G"][2]:
+                        score -= 3
+                    if boardlist["E"][2] == boardlist["E"][1] == boardlist["F"][1]:
+                        score -= 3
+                if boardlist["F"][2] != boardlist["F"][1] and boardlist["F"][1] not in ["s","e"]:
+                    if boardlist["F"][1] == boardlist["G"][1] == boardlist["G"][2]:
+                        score -= 3
+                    if boardlist["F"][1] == boardlist["F"][0]:
+                        score -= 3
+        elif letter == "G":
+            if position == 0:
+                if boardlist["G"][0] != boardlist["F"][0] and boardlist["F"][0] not in ["s","e"]:
+                    if boardlist["F"][0] ==  boardlist["E"][0]:
+                        score -= 3
+                    if boardlist["F"][0] == boardlist["F"][1] == boardlist["G"][1]:
+                        score -= 3
+                if boardlist["G"][0] != boardlist["G"][1]:
+                    if boardlist["G"][1] == boardlist["G"][2]:
+                        score -= 3
+            elif position == 1:
+                score -= 1
+                if boardlist["G"][1] != boardlist["F"][1] and boardlist["F"][1] not in ["s","e"]:
+                    if boardlist["F"][1] == boardlist["E"][1]:
+                        score -= 3
+                    if boardlist["F"][1] == boardlist["F"][0] == boardlist["G"][0]:
+                        score -= 3
+                    if boardlist["F"][1] == boardlist["F"][2] == boardlist["G"][2]:
+                        score -= 3
+                if boardlist["G"][1] == boardlist["G"][0] and boardlist["G"][0] not in ["s","e"]:
+                    if boardlist["G"][0] == boardlist["G"][2]:
+                        score -= 3
+            elif position == 2:
+                if boardlist["G"][2] != boardlist["F"][2] and boardlist["F"][2] not in ["s", "e"]:
+                    if boardlist["F"][2] == boardlist["E"][2]:
+                        score -= 3
+                    if boardlist["F"][2] == boardlist["F"][1] == boardlist["G"][1]:
+                        score -= 3
+                if boardlist["G"][2] != boardlist["G"][1] and boardlist["G"][1] not in ["s", "e"]:
+                    if boardlist["G"][1] == boardlist["G"][0]:
+                        score -= 3
+        else:
+            score += 1
+
+        return score
+
 
 
     def move(self, boardlist, mypiecenumber, theirpiecenumber, mypiece, theirpiece):
         myboardlist = copy.deepcopy(boardlist)
-        check = self.minimax(myboardlist, 0, mypiece, theirpiece, 2, 0)[1]
+        check = self.minimax(myboardlist, 0, mypiece, theirpiece, 4, 0)[1]
         print("Machine player chooses:", end=" ")
         print(check)
         return check
