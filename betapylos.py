@@ -436,14 +436,22 @@ class Machine(Player):
         best = [None, None]
         ## for normal moves
         if flag == 0:
-            movelist = self.moveList(boardlist)
+            movelist = self.moveList(boardlist, mypiece)
             if depth == 0:
                 if side == 0:
                     best = [-math.inf, ["F", 1]]
                     for i in movelist:
-                        self.mplace(i[0], i[1], mypiece, boardlist)
-                        score = self.evaluate(boardlist, i[0], i[1], beginscore)
-                        self.mundoplace(i[0], i[1], boardlist)
+                        if len(i) == 2:
+                            self.mplace(i[0], i[1], mypiece, boardlist)
+                            score = self.evaluate(boardlist, i[0], i[1], beginscore)
+                            self.mundoplace(i[0], i[1], boardlist)
+                        elif len(i) == 4:
+                            self.mplace(i[0], i[1], mypiece, boardlist)
+                            scoreplace = self.evaluate(boardlist, i[0], i[1], beginscore)
+                            score = self.remevaluate(boardlist, i[2], i[3], scoreplace - 9)
+                            self.mundoplace(i[2], i[3], boardlist)
+                            self.mundoplace(i[0], i[1], boardlist)
+                            self.mplace(i[2], i[3], mypiece, boardlist)
                         if score >= best[0]:
                             best[0] = score
                             best[1] = i
@@ -451,7 +459,7 @@ class Machine(Player):
                     best = [math.inf, ["F", 1]]
                     for i in movelist:
                         self.mplace(i[0], i[1], mypiece, boardlist)
-                        score = -(self.evaluate(boardlist, i[0], i[1], -beginscore))
+                        score = -(self.evaluate(boardlist, i[0], i[1], beginscore))
                         self.mundoplace(i[0], i[1], boardlist)
                         if score <= best[0]:
                             best[0] = score
@@ -462,11 +470,21 @@ class Machine(Player):
                     for i in movelist:
                         self.mplace(i[0], i[1], mypiece, boardlist)
                         score = self.evaluate(boardlist, i[0], i[1], beginscore)
-                        if self.mrcheck(i[0], i[1], boardlist):
-                            self.minimax(boardlist, 0, theirpiece, mypiece, depth-1, score, 1)
-                        else:
-                            self.minimax(boardlist, 1, theirpiece, mypiece, depth-1, score, 0)
-                        self.mundoplace(i[0], i[1], boardlist)
+                        if len(i) == 2:
+                            if self.mrcheck(i[0], i[1], boardlist):
+                                self.minimax(boardlist, 0, theirpiece, mypiece, depth-1, score, 1)
+                            else:
+                                self.minimax(boardlist, 1, theirpiece, mypiece, depth-1, score, 0)
+                            self.mundoplace(i[0], i[1], boardlist)
+                        elif len(i) == 4:
+                            score = self.remevaluate(boardlist, i[2], i[3], score - 9)
+                            self.mundoplace(i[2], i[3], boardlist)
+                            if self.mrcheck(i[0], i[1], boardlist):
+                                self.minimax(boardlist, 0, theirpiece, mypiece, depth-1, score, 1)
+                            else:
+                                self.minimax(boardlist, 1, theirpiece, mypiece, depth-1, score, 0)
+                            self.mundoplace(i[0], i[1], boardlist)
+                            self.mplace(i[2], i[3], mypiece, boardlist)
                         if score >= best[0]:
                             best[0] = score
                             best[1] = i
@@ -474,18 +492,28 @@ class Machine(Player):
                     best = [math.inf, ["F", 1]]
                     for i in movelist:
                         self.mplace(i[0], i[1], mypiece, boardlist)
-                        score = -(self.evaluate(boardlist, i[0], i[1], -beginscore))
-                        if self.mrcheck(i[0], i[1], boardlist):
-                            self.minimax(boardlist, 1, theirpiece, mypiece, depth-1, score, 1)
-                        else:
-                            self.minimax(boardlist, 0, theirpiece, mypiece, depth-1, score, 0)
-                        self.mundoplace(i[0], i[1], boardlist)
+                        score = -(self.evaluate(boardlist, i[0], i[1], beginscore))
+                        if len(i) == 2:
+                            if self.mrcheck(i[0], i[1], boardlist):
+                                self.minimax(boardlist, 1, theirpiece, mypiece, depth-1, score, 1)
+                            else:
+                                self.minimax(boardlist, 0, theirpiece, mypiece, depth-1, -score, 0)
+                            self.mundoplace(i[0], i[1], boardlist)
+                        elif len(i) == 4:
+                            score = -(self.remevaluate(boardlist, i[2], i[3], -(score - 9)))
+                            self.mundoplace(i[2], i[3], boardlist)
+                            if self.mrcheck(i[0], i[1], boardlist):
+                                self.minimax(boardlist, 1, theirpiece, mypiece, depth-1, score, 1)
+                            else:
+                                self.minimax(boardlist, 0, theirpiece, mypiece, depth-1, -score, 0)
+                            self.mundoplace(i[0], i[1], boardlist)
+                            self.mplace(i[2], i[3], mypiece, boardlist)
                         if score <= best[0]:
                             best[0] = score
                             best[1] = i
         ## for removes
         elif flag == 1:
-            movelist = self.removeList(boardlist, mypiece)
+            movelist = self.removeList(boardlist, mypiece, 3)
             if depth == 0:
                 if side == 0:
                     best = [-math.inf, ["E", 1]]
@@ -529,7 +557,7 @@ class Machine(Player):
     # Generates possible move list based on game state
     # stores the moves in a list, count
     # @Returns count
-    def moveList(self, boardlist):
+    def moveList(self, boardlist, piece):
         count = []
         for i, x in enumerate(boardlist["E"]):
             if x == "e":
@@ -543,9 +571,21 @@ class Machine(Player):
         for i, x in enumerate(boardlist["H"]):
             if x == "e":
                 count.append(["H", i])
+                self.mplace("H", i, piece, boardlist)
+                removelist = self.removeList(boardlist, piece, 2)
+                if len(removelist) > 0:
+                    for r in removelist:
+                        count.append(["H", i, r[0], r[1]])
+                self.mundoplace("H", i, boardlist)
         for i, x in enumerate(boardlist["I"]):
             if x == "e":
                 count.append(["I", i])
+                self.mplace("I", i, piece, boardlist)
+                removelist = self.removeList(boardlist, piece, 2)
+                if len(removelist) > 0:
+                    for r in removelist:
+                        count.append(["I", i, r[0], r[1]])
+                self.mundoplace("I", i, boardlist)
         for i, x in enumerate(boardlist["J"]):
             if x == "e":
                 count.append(["J", i])
@@ -554,23 +594,25 @@ class Machine(Player):
     # Generates  possible remove list based on game state
     # stores the moves in a list, count
     # @Returns count
-    def removeList(self, boardlist, piece):
+    def removeList(self, boardlist, piece, level):
         count = []
-        for i, x in enumerate(boardlist["E"]):
-            if x == piece and self.mcanremove("E", i, boardlist):
-                count.append(["E", i])
-        for i, x in enumerate(boardlist["F"]):
-            if x == piece and self.mcanremove("F", i, boardlist):
-                count.append(["F", i])
-        for i, x in enumerate(boardlist["G"]):
-            if x == piece and self.mcanremove("G", i, boardlist):
-                count.append(["G", i])
-        for i, x in enumerate(boardlist["H"]):
-            if x == piece:
-                count.append(["H", i])
-        for i, x in enumerate(boardlist["I"]):
-            if x == piece:
-                count.append(["I", i])
+        if level >= 2:
+            for i, x in enumerate(boardlist["E"]):
+                if x == piece and self.mcanremove("E", i, boardlist):
+                    count.append(["E", i])
+            for i, x in enumerate(boardlist["F"]):
+                if x == piece and self.mcanremove("F", i, boardlist):
+                    count.append(["F", i])
+            for i, x in enumerate(boardlist["G"]):
+                if x == piece and self.mcanremove("G", i, boardlist):
+                    count.append(["G", i])
+        if level >= 3:
+            for i, x in enumerate(boardlist["H"]):
+                if x == piece:
+                    count.append(["H", i])
+            for i, x in enumerate(boardlist["I"]):
+                if x == piece:
+                    count.append(["I", i])
         return count
 
     # Places piece on position
@@ -780,7 +822,7 @@ class Machine(Player):
                     if boardlist["E"][0] == boardlist["E"][2]:
                         score += 7
                     if boardlist["E"][0] == boardlist["F"][0] == boardlist["F"][1]:
-                        score += 6
+                        score += 7
                 if boardlist["E"][1] != boardlist["F"][1] and boardlist["F"][1] not in ["s","e"]:
                     if boardlist["F"][1] == boardlist["G"][1]:
                         score += 7
@@ -1148,7 +1190,7 @@ class Machine(Player):
         elif letter == "G":
             if position == 0:
                 if boardlist["G"][0] != boardlist["F"][0] and boardlist["F"][0] not in ["s","e"]:
-                    if boardlist["F"][0] ==  boardlist["E"][0]:
+                    if boardlist["F"][0] == boardlist["E"][0]:
                         score -= 3
                     if boardlist["F"][0] == boardlist["F"][1] == boardlist["G"][1]:
                         score -= 3
