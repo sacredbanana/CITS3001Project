@@ -41,9 +41,9 @@ class Board(object):
 
         global simpler_board
         simpler_board = {
-            "E": ["b","w","e"],
-            "F": ["w","w","b"],
-            "G": ["e","b","e"],
+            "E": ["w","w","e"],
+            "F": ["b","w","b"],
+            "G": ["b","b","w"],
             "H": ["s","s"],
             "I": ["s","s"],
             "J": ["s"],
@@ -51,7 +51,7 @@ class Board(object):
         }
 
         global board_list
-        board_list = simple_board
+        board_list = simpler_board
 
         global last_move
         last_move = ["Z", 0]
@@ -317,35 +317,82 @@ class Board(object):
             # removes pieces
             if self.rcheck(last_move[0], last_move[1]):
                 player = switchPlayer(player)
-                # Tell player it's their turn
-                print(player.name + "'s move please remove a piece.")
-                if player is self.white:
-                    input_list = player.move(board_list, self.whitepieces, self.blackpieces, "w", "b", 1)
-                else:
-                    input_list = player.move(board_list, self.blackpieces, self.whitepieces, "b", "w", 1)
-                try:
-                    i = str(input_list[0])
-                    j = int(input_list[1])
-                except:
-                    print("Invalid input.")
-                    player = switchPlayer(player)
-                    continue
-                if player is self.white:
-                    if self.raisep("Z", 0, "w", i, j, board_list, self.whitepieces):
-                        self.whitepieces += 1
-                        print("Piece removed from " + i + "," + str(j))
-                        print(player.name + " now has " + str(self.whitepieces) + " pieces left.")
-                        last_move[0] = i
-                        last_move[1] = j
-                else:
-                    if self.raisep("Z", 0, "b", i, j, board_list, self.blackpieces):
-                        self.blackpieces += 1
-                        print("Piece removed from " + i + "," + str(j))
-                        print(player.name + " now has " + str(self.blackpieces) + " pieces left.")
-                        last_move[0] = i
-                        last_move[1] = j
+                x = 0
+                while True:
+                    if x == 1:
+                        break
+                    # Tell player it's their turn
+                    print(player.name + "'s move please remove a piece.")
+                    if player is self.white:
+                        input_list = player.move(board_list, self.whitepieces, self.blackpieces, "w", "b", 1)
+                    else:
+                        input_list = player.move(board_list, self.blackpieces, self.whitepieces, "b", "w", 1)
+                    try:
+                        i = str(input_list[0])
+                        j = int(input_list[1])
+                    except:
+                        print("Invalid input.")
+                        continue
+                    if player is self.white:
+                        if self.raisep("Z", 0, "w", i, j, board_list, self.whitepieces):
+                            self.whitepieces += 1
+                            print("Piece removed from " + i + "," + str(j))
+                            print(player.name + " now has " + str(self.whitepieces) + " pieces left.")
+                            last_move[0] = i
+                            last_move[1] = j
+                        else:
+                            continue
+                    else:
+                        if self.raisep("Z", 0, "b", i, j, board_list, self.blackpieces):
+                            self.blackpieces += 1
+                            print("Piece removed from " + i + "," + str(j))
+                            print(player.name + " now has " + str(self.blackpieces) + " pieces left.")
+                            last_move[0] = i
+                            last_move[1] = j
+                        else:
+                            continue
+                    x = 1
+                    print(last_move)
+                board_list["Z"][0] = "e"
+                while x == 1:
+                    # Tell player it's their turn
+                    print(player.name + "'s move please remove another piece. Or enter nothing to skip.")
+                    if player is self.white:
+                        input_list = player.move(board_list, self.whitepieces, self.blackpieces, "w", "b", 1)
+                    else:
+                        input_list = player.move(board_list, self.blackpieces, self.whitepieces, "b", "w", 1)
+                    if input_list == [""]:
+                        x = 0
+                        break
+                    try:
+                        i = str(input_list[0])
+                        j = int(input_list[1])
+                    except:
+                        print("Invalid input.")
+                        continue
+                    if player is self.white:
+                        if self.raisep("Z", 0, "w", i, j, board_list, self.whitepieces):
+                            self.whitepieces += 1
+                            print("Piece removed from " + i + "," + str(j))
+                            print(player.name + " now has " + str(self.whitepieces) + " pieces left.")
+                            last_move[0] = i
+                            last_move[1] = j
+                        else:
+                            continue
+                    else:
+                        if self.raisep("Z", 0, "b", i, j, board_list, self.blackpieces):
+                            self.blackpieces += 1
+                            print("Piece removed from " + i + "," + str(j))
+                            print(player.name + " now has " + str(self.blackpieces) + " pieces left.")
+                            last_move[0] = i
+                            last_move[1] = j
+                        else:
+                            continue
+                    x = 0
+                    print(last_move)
                 player = switchPlayer(player)
-                print(last_move)
+
+
             # placing pieces
             else:
                 # Tell player it's their turn
