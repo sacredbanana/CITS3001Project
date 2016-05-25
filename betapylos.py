@@ -356,12 +356,12 @@ class Board(object):
                 board_list["Z"][0] = "e"
                 while x == 1:
                     # Tell player it's their turn
-                    print(player.name + "'s move please remove another piece. Or enter nothing to skip.")
+                    print(player.name + "'s move please remove another piece. Or enter _ to skip")
                     if player is self.white:
-                        input_list = player.move(board_list, self.whitepieces, self.blackpieces, "w", "b", 1)
+                        input_list = player.move(board_list, self.whitepieces, self.blackpieces, "w", "b", 2)
                     else:
-                        input_list = player.move(board_list, self.blackpieces, self.whitepieces, "b", "w", 1)
-                    if input_list == [""]:
+                        input_list = player.move(board_list, self.blackpieces, self.whitepieces, "b", "w", 2)
+                    if input_list == ["_"] or input_list == "_":
                         x = 0
                         break
                     try:
@@ -490,11 +490,11 @@ class Machine(Player):
                     for i in movelist:
                         if len(i) == 2:
                             self.mplace(i[0], i[1], mypiece, boardlist)
-                            score = self.evaluate(boardlist, i[0], i[1], beginscore)
+                            score = self.evaluate(boardlist, i[0], i[1], -beginscore)
                             self.mundoplace(i[0], i[1], boardlist)
                         elif len(i) == 4:
                             self.mplace(i[0], i[1], mypiece, boardlist)
-                            scoreplace = self.evaluate(boardlist, i[0], i[1], beginscore)
+                            scoreplace = self.evaluate(boardlist, i[0], i[1], -beginscore)
                             score = self.remevaluate(boardlist, i[2], i[3], scoreplace - 9)
                             self.mundoplace(i[2], i[3], boardlist)
                             self.mundoplace(i[0], i[1], boardlist)
@@ -516,7 +516,7 @@ class Machine(Player):
                     best = [-math.inf, ["F", 1]]
                     for i in movelist:
                         self.mplace(i[0], i[1], mypiece, boardlist)
-                        score = self.evaluate(boardlist, i[0], i[1], beginscore)
+                        score = self.evaluate(boardlist, i[0], i[1], -beginscore)
                         if len(i) == 2:
                             if self.mrcheck(i[0], i[1], boardlist):
                                 self.minimax(boardlist, 0, theirpiece, mypiece, depth-1, score, 1)
@@ -572,7 +572,7 @@ class Machine(Player):
                 else:
                     best = [math.inf, ["E", 1]]
                     for i in movelist:
-                        score = self.remevaluate(boardlist, i[0], i[1], beginscore)
+                        score = -(self.remevaluate(boardlist, i[0], i[1], beginscore))
                         if score <= best[0]:
                             best[0] = score
                             best[1] = i
@@ -582,7 +582,7 @@ class Machine(Player):
                     for i in movelist:
                         score = self.remevaluate(boardlist, i[0], i[1], beginscore)
                         self.mundoplace(i[0],i[1], boardlist)
-                        self.minimax(boardlist, 1, theirpiece, mypiece, depth-1, score, 0)
+                        self.minimax(boardlist, 1, mypiece, theirpiece, depth-1, score, 2)
                         self.mplace(i[0], i[1], mypiece, boardlist)
                         if score >= best[0]:
                             best[0] = score
@@ -590,10 +590,65 @@ class Machine(Player):
                 else:
                     best = [math.inf, ["E", 1]]
                     for i in movelist:
-                        score = self.remevaluate(boardlist, i[0], i[1], beginscore)
+                        score = -(self.remevaluate(boardlist, i[0], i[1], beginscore))
                         self.mundoplace(i[0],i[1], boardlist)
-                        self.minimax(boardlist, 0, theirpiece, mypiece, depth-1, score, 0)
+                        self.minimax(boardlist, 0, mypiece, theirpiece, depth-1, score, 2)
                         self.mplace(i[0], i[1], mypiece, boardlist)
+                        if score <= best[0]:
+                            best[0] = score
+                            best[1] = i
+
+        ## for optional removes
+        elif flag == 2:
+            movelist = self.removeList(boardlist, mypiece, 3)
+            movelist.append("_")
+            if depth == 0:
+                if side == 0:
+                    best = [-math.inf, ["E", 1]]
+                    for i in movelist:
+                        if i == "_":
+                            score = self.remevaluate(boardlist, "", "", beginscore)
+                        else:
+                            score = self.remevaluate(boardlist, i[0], i[1], beginscore)
+                        if score >= best[0]:
+                            best[0] = score
+                            best[1] = i
+                else:
+                    best = [math.inf, ["E", 1]]
+                    for i in movelist:
+                        if i == "_":
+                            score = -(self.remevaluate(boardlist, "", "", -beginscore))
+                        else:
+                            score = -(self.remevaluate(boardlist, i[0], i[1], -beginscore))
+                        if score <= best[0]:
+                            best[0] = score
+                            best[1] = i
+            else:
+                if side == 0:
+                    best = [-math.inf, ["E", 1]]
+                    for i in movelist:
+                        if i == "_":
+                            score = self.remevaluate(boardlist, "", "", beginscore)
+                            self.minimax(boardlist, 1, theirpiece, mypiece, depth-1, score, 0)
+                        else:
+                            score = self.remevaluate(boardlist, i[0], i[1], beginscore)
+                            self.mundoplace(i[0],i[1], boardlist)
+                            self.minimax(boardlist, 1, theirpiece, mypiece, depth-1, score, 0)
+                            self.mplace(i[0], i[1], mypiece, boardlist)
+                        if score >= best[0]:
+                            best[0] = score
+                            best[1] = i
+                else:
+                    best = [math.inf, ["E", 1]]
+                    for i in movelist:
+                        if i == "_":
+                            score = -(self.remevaluate(boardlist, "", "", -beginscore))
+                            self.minimax(boardlist, 0, theirpiece, mypiece, depth-1, score, 0)
+                        else:
+                            score = -(self.remevaluate(boardlist, i[0], i[1], -beginscore))
+                            self.mundoplace(i[0],i[1], boardlist)
+                            self.minimax(boardlist, 0, theirpiece, mypiece, depth-1, score, 0)
+                            self.mplace(i[0], i[1], mypiece, boardlist)
                         if score <= best[0]:
                             best[0] = score
                             best[1] = i
@@ -606,6 +661,18 @@ class Machine(Player):
     # @Returns count
     def moveList(self, boardlist, piece):
         count = []
+        for i, x in enumerate(boardlist["A"]):
+            if x == "e":
+                count.append(["A", i])
+        for i, x in enumerate(boardlist["B"]):
+            if x == "e":
+                count.append(["B", i])
+        for i, x in enumerate(boardlist["C"]):
+            if x == "e":
+                count.append(["C", i])
+        for i, x in enumerate(boardlist["C"]):
+            if x == "e":
+                count.append(["D", i])
         for i, x in enumerate(boardlist["E"]):
             if x == "e":
                 count.append(["E", i])
@@ -643,6 +710,19 @@ class Machine(Player):
     # @Returns count
     def removeList(self, boardlist, piece, level):
         count = []
+        if level >= 1:
+            for i, x in enumerate(boardlist["A"]):
+                if x == piece and self.mcanremove("A", i, boardlist):
+                    count.append(["A", i])
+            for i, x in enumerate(boardlist["B"]):
+                if x == piece and self.mcanremove("B", i, boardlist):
+                    count.append(["B", i])
+            for i, x in enumerate(boardlist["C"]):
+                if x == piece and self.mcanremove("C", i, boardlist):
+                    count.append(["C", i])
+            for i, x in enumerate(boardlist["D"]):
+                if x == piece and self.mcanremove("D", i, boardlist):
+                    count.append(["D", i])
         if level >= 2:
             for i, x in enumerate(boardlist["E"]):
                 if x == piece and self.mcanremove("E", i, boardlist):
@@ -672,13 +752,8 @@ class Machine(Player):
                 self.mboard_update(boardlist)
                 return True
             else:
-                print("Position is not empty.1")
-                print(letter)
-                print(position)
-                print(boardlist[letter][position])
                 return False
         except:
-            print("Invalid input, please check your input is correct.111")
             return False
 
     def mundoplace(self, letter, position, boardlist):
@@ -687,7 +762,6 @@ class Machine(Player):
                 self.mboard_update(boardlist)
                 return True
             else:
-                print("mundplace has an error.")
                 return False
 
     def mboard_update(self, boardlist):
@@ -721,67 +795,215 @@ class Machine(Player):
         for v, w in boardlist["F"][1:3], boardlist["G"][1:3]:
             if v == "e" or w == "e" or v == "s" or w == "s":
                 boardlist["I"][1] = "s"
-
-    def mboard_visual(self, boardlist):
-        print("")
-        print(boardlist["E"], "   ", boardlist["H"], "   ", boardlist["J"])
-        print(boardlist["F"], "   ", boardlist["I"])
-        print(boardlist["G"])
+        # Unseals E[0]
+        if boardlist["E"][0] == "s":
+            boardlist["E"][0] = "e"
+        for v, w in boardlist["A"][:2], boardlist["B"][:2]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["E"][0] = "s"
+        # Unseals E[1]
+        if boardlist["E"][1] == "s":
+            boardlist["E"][1] = "e"
+        for v, w in boardlist["A"][1:3], boardlist["B"][1:3]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["E"][1] = "s"
+        # Unseals E[2]
+        if boardlist["E"][2] == "s":
+            boardlist["E"][2] = "e"
+        for v, w in boardlist["A"][2:4], boardlist["B"][2:4]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["E"][2] = "s"
+        # Unseals F[0]
+        if boardlist["F"][0] == "s":
+            boardlist["F"][0] = "e"
+        for v, w in boardlist["B"][:2], boardlist["C"][:2]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["F"][0] = "s"
+        # Unseals F[1]
+        if boardlist["F"][1] == "s":
+            boardlist["F"][1] = "e"
+        for v, w in boardlist["B"][1:3], boardlist["C"][1:3]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["F"][1] = "s"
+        # Unseals F[2]
+        if boardlist["F"][2] == "s":
+            boardlist["F"][2] = "e"
+        for v, w in boardlist["B"][2:4], boardlist["C"][2:4]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["F"][2] = "s"
+        # Unseals G[0]
+        if boardlist["G"][0] == "s":
+            boardlist["G"][0] = "e"
+        for v, w in boardlist["C"][:2], boardlist["D"][:2]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["G"][0] = "s"
+        # Unseals G[1]
+        if boardlist["G"][1] == "s":
+            boardlist["G"][1] = "e"
+        for v, w in boardlist["C"][1:3], boardlist["D"][1:3]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["G"][1] = "s"
+        # Unseals G[2]
+        if boardlist["G"][2] == "s":
+            boardlist["G"][2] = "e"
+        for v, w in boardlist["C"][2:4], boardlist["D"][2:4]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["G"][2] = "s"
 
     # Checks if a piece needs to be removed
     # @Returns True if a piece needs to be removed
     # @Returns False if otherwise
     def mrcheck(self, letter, position, boardlist):
         if boardlist[letter][position] != "s" and boardlist[letter][position] != "e":
+            # Level 0
+            if letter in ("A", "B", "C", "D"):
+                if boardlist["A"][position] == boardlist["B"][position] == boardlist["C"][position] == boardlist["D"][position]:
+                    return True
+                if boardlist[letter][0] == boardlist[letter][1] == boardlist[letter][2] == boardlist[letter][3]:
+                    return True
+                if letter == "A":
+                    if position == 0:
+                        if boardlist["A"][0] == boardlist["A"][1] == boardlist["B"][0] == boardlist["B"][1]:
+                            return True
+                    if position == 1:
+                        if boardlist["A"][0] == boardlist["A"][1] == boardlist["B"][0] == boardlist["B"][1]:
+                            return True
+                        if boardlist["A"][1] == boardlist["A"][2] == boardlist["B"][1] == boardlist["B"][2]:
+                            return True
+                    if position == 2:
+                        if boardlist["A"][2] == boardlist["A"][3] == boardlist["B"][2] == boardlist["B"][3]:
+                            return True
+                        if boardlist["A"][1] == boardlist["A"][2] == boardlist["B"][1] == boardlist["B"][2]:
+                            return True
+                    if position == 3:
+                        if boardlist["A"][2] == boardlist["A"][3] == boardlist["B"][2] == boardlist["B"][3]:
+                            return True
+                if letter == "B":
+                    if position == 0:
+                        if boardlist["B"][0] == boardlist["B"][1] == boardlist["A"][0] == boardlist["A"][1]:
+                            return True
+                        if boardlist["B"][0] == boardlist["B"][1] == boardlist["C"][0] == boardlist["C"][1]:
+                            return True
+                    if position == 1:
+                        if boardlist["B"][0] == boardlist["B"][1] == boardlist["A"][0] == boardlist["A"][1]:
+                            return True
+                        if boardlist["B"][0] == boardlist["B"][1] == boardlist["C"][0] == boardlist["C"][1]:
+                            return True
+                        if boardlist["B"][1] == boardlist["A"][1] == boardlist["B"][2] == boardlist["A"][2]:
+                            return True
+                        if boardlist["B"][1] == boardlist["C"][1] == boardlist["B"][2] == boardlist["C"][2]:
+                            return True
+                    if position == 2:
+                        if boardlist["B"][1] == boardlist["A"][1] == boardlist["B"][2] == boardlist["A"][2]:
+                            return True
+                        if boardlist["B"][1] == boardlist["C"][1] == boardlist["B"][2] == boardlist["C"][2]:
+                            return True
+                        if boardlist["B"][2] == boardlist["A"][2] == boardlist["B"][3] == boardlist["A"][3]:
+                            return True
+                        if boardlist["B"][2] == boardlist["C"][2] == boardlist["B"][3] == boardlist["C"][3]:
+                            return True
+                    if position == 3:
+                        if boardlist["B"][2] == boardlist["A"][2] == boardlist["B"][3] == boardlist["A"][3]:
+                            return True
+                        if boardlist["B"][2] == boardlist["C"][2] == boardlist["B"][3] == boardlist["C"][3]:
+                            return True
+                if letter == "C":
+                    if position == 0:
+                        if boardlist["C"][0] == boardlist["B"][0] == boardlist["B"][1] == boardlist["C"][1]:
+                            return True
+                        if boardlist["C"][0] == boardlist["D"][0] == boardlist["D"][1] == boardlist["C"][1]:
+                            return True
+                    if position == 1:
+                        if boardlist["C"][0] == boardlist["B"][0] == boardlist["B"][1] == boardlist["C"][1]:
+                            return True
+                        if boardlist["C"][0] == boardlist["D"][0] == boardlist["D"][1] == boardlist["C"][1]:
+                            return True
+                        if boardlist["C"][1] == boardlist["B"][1] == boardlist["B"][2] == boardlist["C"][2]:
+                            return True
+                        if boardlist["C"][1] == boardlist["C"][2] == boardlist["D"][1] == boardlist["D"][2]:
+                            return True
+                    if position == 2:
+                        if boardlist["C"][1] == boardlist["B"][1] == boardlist["B"][2] == boardlist["C"][2]:
+                            return True
+                        if boardlist["C"][1] == boardlist["C"][2] == boardlist["D"][1] == boardlist["D"][2]:
+                            return True
+                        if boardlist["C"][2] == boardlist["B"][2] == boardlist["B"][2] == boardlist["C"][3]:
+                            return True
+                        if boardlist["C"][2] == boardlist["C"][3] == boardlist["D"][3] == boardlist["D"][2]:
+                            return True
+                    if position == 3:
+                        if boardlist["C"][2] == boardlist["B"][2] == boardlist["B"][2] == boardlist["C"][3]:
+                            return True
+                        if boardlist["C"][2] == boardlist["C"][3] == boardlist["D"][3] == boardlist["D"][2]:
+                            return True
+                if letter == "D":
+                    if position == 0:
+                        if boardlist["D"][0] == boardlist["C"][0] == boardlist["C"][1] == boardlist["D"][1]:
+                            return True
+                    if position == 1:
+                        if boardlist["D"][0] == boardlist["C"][0] == boardlist["C"][1] == boardlist["D"][1]:
+                            return True
+                        if boardlist["D"][1] == boardlist["C"][1] == boardlist["C"][2] == boardlist["D"][2]:
+                            return True
+                    if position == 2:
+                        if boardlist["D"][1] == boardlist["C"][1] == boardlist["C"][2] == boardlist["D"][2]:
+                            return True
+                        if boardlist["D"][2] == boardlist["C"][2] == boardlist["C"][3] == boardlist["D"][3]:
+                            return True
+                    if position == 3:
+                        if boardlist["D"][2] == boardlist["C"][2] == boardlist["C"][3] == boardlist["D"][3]:
+                            return True
+            # Level 1
             if letter in ("E", "F", "G"):
                 if boardlist["E"][position] == boardlist["F"][position] == boardlist["G"][position]:
                     return True
                 if boardlist[letter][0] == boardlist[letter][1] == boardlist[letter][2]:
                     return True
-            if letter == "E":
-                if position == 0:
-                    if boardlist["E"][0] == boardlist["E"][1] == boardlist["F"][0] == boardlist["F"][1]:
-                        return True
-                if position == 2:
-                    if boardlist["E"][1] == boardlist["E"][2] == boardlist["F"][1] == boardlist["F"][2]:
-                        return True
-                if position == 1:
-                    if boardlist["E"][0] == boardlist["E"][1] == boardlist["F"][0] == boardlist["F"][1]:
-                        return True
-                    if boardlist["E"][1] == boardlist["E"][2] == boardlist["F"][1] == boardlist["F"][2]:
-                        return True
-            if letter == "F":
-                if position == 0:
-                    if boardlist["E"][0] == boardlist["E"][1] == boardlist["F"][0] == boardlist["F"][1]:
-                        return True
-                    if boardlist["G"][0] == boardlist["G"][1] == boardlist["F"][0] == boardlist["F"][1]:
-                        return True
-                if position == 2:
-                    if boardlist["E"][1] == boardlist["E"][2] == boardlist["F"][1] == boardlist["F"][2]:
-                        return True
-                    if boardlist["G"][1] == boardlist["G"][2] == boardlist["F"][1] == boardlist["F"][2]:
-                        return True
-                if position == 1:
-                    if boardlist["E"][0] == boardlist["E"][1] == boardlist["F"][0] == boardlist["F"][1]:
-                        return True
-                    if boardlist["G"][0] == boardlist["G"][1] == boardlist["F"][0] == boardlist["F"][1]:
-                        return True
-                    if boardlist["E"][1] == boardlist["E"][2] == boardlist["F"][1] == boardlist["F"][2]:
-                        return True
-                    if boardlist["G"][1] == boardlist["G"][2] == boardlist["F"][1] == boardlist["F"][2]:
-                        return True
-            if letter == "G":
-                if position == 0:
-                    if boardlist["G"][0] == boardlist["G"][1] == boardlist["F"][0] == boardlist["F"][1]:
-                        return True
-                if position == 2:
-                    if boardlist["G"][1] == boardlist["G"][2] == boardlist["F"][1] == boardlist["F"][2]:
-                        return True
-                if position == 1:
-                    if boardlist["G"][0] == boardlist["G"][1] == boardlist["F"][0] == boardlist["F"][1]:
-                        return True
-                    if boardlist["G"][1] == boardlist["G"][2] == boardlist["F"][1] == boardlist["F"][2]:
-                        return True
+                if letter == "E":
+                    if position == 0:
+                        if boardlist["E"][0] == boardlist["E"][1] == boardlist["F"][0] == boardlist["F"][1]:
+                            return True
+                    if position == 2:
+                        if boardlist["E"][1] == boardlist["E"][2] == boardlist["F"][1] == boardlist["F"][2]:
+                            return True
+                    if position == 1:
+                        if boardlist["E"][0] == boardlist["E"][1] == boardlist["F"][0] == boardlist["F"][1]:
+                            return True
+                        if boardlist["E"][1] == boardlist["E"][2] == boardlist["F"][1] == boardlist["F"][2]:
+                            return True
+                if letter == "F":
+                    if position == 0:
+                        if boardlist["E"][0] == boardlist["E"][1] == boardlist["F"][0] == boardlist["F"][1]:
+                            return True
+                        if boardlist["G"][0] == boardlist["G"][1] == boardlist["F"][0] == boardlist["F"][1]:
+                            return True
+                    if position == 2:
+                        if boardlist["E"][1] == boardlist["E"][2] == boardlist["F"][1] == boardlist["F"][2]:
+                            return True
+                        if boardlist["G"][1] == boardlist["G"][2] == boardlist["F"][1] == boardlist["F"][2]:
+                            return True
+                    if position == 1:
+                        if boardlist["E"][0] == boardlist["E"][1] == boardlist["F"][0] == boardlist["F"][1]:
+                            return True
+                        if boardlist["G"][0] == boardlist["G"][1] == boardlist["F"][0] == boardlist["F"][1]:
+                            return True
+                        if boardlist["E"][1] == boardlist["E"][2] == boardlist["F"][1] == boardlist["F"][2]:
+                            return True
+                        if boardlist["G"][1] == boardlist["G"][2] == boardlist["F"][1] == boardlist["F"][2]:
+                            return True
+                if letter == "G":
+                    if position == 0:
+                        if boardlist["G"][0] == boardlist["G"][1] == boardlist["F"][0] == boardlist["F"][1]:
+                            return True
+                    if position == 2:
+                        if boardlist["G"][1] == boardlist["G"][2] == boardlist["F"][1] == boardlist["F"][2]:
+                            return True
+                    if position == 1:
+                        if boardlist["G"][0] == boardlist["G"][1] == boardlist["F"][0] == boardlist["F"][1]:
+                            return True
+                        if boardlist["G"][1] == boardlist["G"][2] == boardlist["F"][1] == boardlist["F"][2]:
+                            return True
+            # Level 2
             if letter in ("H", "I"):
                 if boardlist["H"][0] == boardlist["H"][1] == boardlist["I"][0] == boardlist["I"][1]:
                     return True
@@ -792,58 +1014,91 @@ class Machine(Player):
     # @Returns True if no piece stands on top of the position
     # @Returns False if a piece is stacked on top of the position
     def mcanremove(self, letter, position, boardlist):
-        if letter == "E":
+        if letter == "A":
+            if position == 0:
+                if boardlist["E"][0] in ("s", "e"):
+                    return True
+            if position == 1:
+                if boardlist["E"][0] in ("s", "e") and boardlist["E"][1] in in ("s", "e"):
+                    return True
+            if position == 2:
+                if boardlist["E"][1] in ("s", "e") and boardlist["E"][2] in ("s", "e"):
+                    return True
+            if position == 3:
+                if boardlist["E"][2] in ("s", "e"):
+                    return True
+        elif letter == "B":
+            if position == 0:
+                if boardlist["E"][0] in ("s", "e") and boardlist["F"][0] in ("s", "e"):
+                    return True
+            if position == 1:
+                if boardlist["E"][0] in ("s", "e") and boardlist["F"][0] in ("s", "e") and boardlist["E"][1] in ("s", "e") and boardlist["F"][1] in ("s", "e"):
+                    return True
+            if position == 2:
+                if boardlist["E"][1] in ("s", "e") and boardlist["F"][1] in ("s", "e") and boardlist["E"][2] in ("s", "e") and boardlist["F"][2] in ("s", "e"):
+                    return True
+            if position == 3:
+                if boardlist["E"][2] in ("s", "e") and boardlist["F"][2] in ("s", "e"):
+                    return True
+        elif letter == "C":
+            if position == 0:
+                if boardlist["F"][0] in ("s", "e") and boardlist["G"][0] in ("s", "e"):
+                    return True
+            if position == 1:
+                if boardlist["F"][0] in ("s", "e") and boardlist["G"][0] in ("s", "e") and boardlist["F"][1] in ("s", "e") and boardlist["G"][1] in ("s", "e"):
+                    return True
+            if position == 2:
+                if boardlist["F"][1] in ("s", "e") and boardlist["F"][2] in ("s", "e") and boardlist["G"][1] in ("s", "e") and boardlist["G"][2] in ("s", "e"):
+                    return True
+            if position == 3:
+                if boardlist["F"][2] in ("s", "e") and boardlist["G"][2] in ("s", "e"):
+                    return True
+        elif letter == "D":
+            if position == 0:
+                if boardlist["G"][0] in ("s", "e"):
+                    return True
+            if position == 1:
+                if boardlist["G"][0] in ("s", "e") and  boardlist["G"][1] in ("s", "e"):
+                    return True
+            if position == 2:
+                if boardlist["G"][1] in ("s", "e") and  boardlist["G"][2] in ("s", "e"):
+                    return True
+            if position == 3:
+                if boardlist["G"][2] in ("s", "e"):
+                    return True
+        elif letter == "E":
             if position == 0:
                 if boardlist["H"][0] in ("s", "e"):
                     return True
-                else:
-                    return False
             if position == 1:
                 if boardlist["H"][0] in ("s", "e") and boardlist["H"][1] in ("s", "e"):
                     return True
-                else:
-                    return False
             if position == 2:
                 if boardlist["H"][1] in ("s", "e"):
                     return True
-                else:
-                    return False
         elif letter == "F":
             if position == 0:
                 if boardlist["H"][0] in ("s", "e") and boardlist["I"][0] in ("s", "e"):
                     return True
-                else:
-                    return False
             if position == 1:
                 if boardlist["H"][0] in ("s", "e") and boardlist["H"][1] in ("s", "e") and boardlist["I"][0] in ("s", "e") and boardlist["I"][1] in ("s", "e"):
                     return True
-                else:
-                    return False
             if position == 2:
                 if boardlist["H"][1] in ("s", "e") and boardlist["I"][1] in ("s", "e"):
                     return True
-                else:
-                    return False
         elif letter == "G":
             if position == 0:
                 if boardlist["I"][0] in ("s", "e"):
                     return True
-                else:
-                    return False
             if position == 1:
                 if boardlist["I"][0] in ("s", "e") and boardlist["I"][1] in ("s", "e"):
                     return True
-                else:
-                    return False
             if position == 2:
                 if boardlist["I"][1] in ("s", "e"):
                     return True
-                else:
-                    return False
         elif letter in ("H", "I"):
             return True
-        else:
-            return False
+        return False
 
     # Utility function for normal place moves
     def evaluate(self, boardlist, letter, position, prevscore):
@@ -854,7 +1109,41 @@ class Machine(Player):
         if self.mrcheck(letter, position, boardlist):
             score += 10
         ## stop them from winning
-        if letter == "E":
+        if letter == "A":
+            if position == 0:
+                if boardlist["A"][0] != boardlist["A"][1] and boardlist["A"][1] not in ["s","e"]:
+                    if boardlist["A"][1] == boardlist["A"][2] == boardlist["A"][3]:
+                        score += 7
+                    if boardlist["A"][1] == boardlist["B"][1] == boardlist["B"][0]:
+                        score +=7
+                if boardlist["A"][0] != boardlist["B"][0] and boardlist["B"][0] not in ["s","e"]:
+                    if boardlist["B"][0] == boardlist["C"][0] == boardlist["D"][0]:
+                        score += 7
+            if position == 1:
+                if boardlist["A"][1] != boardlist["A"][0] and boardlist["A"][0] not in ["s","e"]:
+                    if boardlist["A"][0] == boardlist["A"][2] == boardlist["A"][3]:
+                        score += 7
+                    if boardlist["A"][0] == boardlist["B"][0] == boardlist["B"][1]:
+                        score += 7
+                if boardlist["A"][1] != boardlist["B"][1] and boardlist["B"][1] not in ["s","e"]:
+                    if boardlist["B"][1] == boardlist["C"][1] == boardlist["D"][1]:
+                        score += 7
+                    if boardlist["B"][1] == boardlist["B"][2] == boardlist["A"][2]:
+                        score += 7
+            if position == 2:
+                if boardlist["A"][2] != boardlist["A"][3] and boardlist["A"][3] not in ["s","e"]:
+                    if boardlist["A"][3] == boardlist["A"][1] == boardlist["A"][0]:
+                        score += 7
+                    if boardlist["A"][3] == boardlist["B"][3] == boardlist["B"][2]:
+                        score += 7
+                if boardlist["A"][2] != boardlist["B"][2] and boardlist["B"][2] not in ["s","e"]:
+                    if boardlist["B"][2] == boardlist["C"][2] == boardlist["D"][2]:
+                        score += 7
+                    if boardlist["B"][2] == boardlist["B"][1] == boardlist["A"][1]:
+                        score += 7
+            if position == 3:
+                #todo
+        elif letter == "E":
             if position == 0:
                 if boardlist["E"][0] != boardlist["E"][1] and boardlist["E"][1] not in ["s","e"]:
                     if boardlist["E"][1] == boardlist["E"][2]:
@@ -1160,6 +1449,8 @@ class Machine(Player):
     # Utility function for removes
     def remevaluate(self, boardlist, letter, position, prevscore):
         score = prevscore + 10
+        if letter == "":
+            return score
         if self.mrcheck(letter, position, boardlist):
             score += 3
         if letter == "E":
