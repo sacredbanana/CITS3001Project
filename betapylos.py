@@ -988,7 +988,7 @@ class Machine(Player):
         for i, x in enumerate(boardlist["C"]):
             if x == "e":
                 count.append(["C", i])
-        for i, x in enumerate(boardlist["C"]):
+        for i, x in enumerate(boardlist["D"]):
             if x == "e":
                 count.append(["D", i])
         for i, x in enumerate(boardlist["E"]):
