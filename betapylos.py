@@ -977,7 +977,6 @@ class Machine(Player):
     # Generates possible move list based on game state
     # stores the moves in a list, count
     # @Returns count
-    # todo include raise movelist for level 1
     def moveList(self, boardlist, piece):
         count = []
         for i, x in enumerate(boardlist["A"]):
@@ -989,7 +988,7 @@ class Machine(Player):
         for i, x in enumerate(boardlist["C"]):
             if x == "e":
                 count.append(["C", i])
-        for i, x in enumerate(boardlist["D"]):
+        for i, x in enumerate(boardlist["C"]):
             if x == "e":
                 count.append(["D", i])
         for i, x in enumerate(boardlist["E"]):
