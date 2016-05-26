@@ -31,12 +31,12 @@ class Board(object):
         }
         global actual_board_test
         actual_board_test = {
-            "A": ["w","w","w","e"],
-            "B": ["w","b","w","w"],
-            "C": ["b","b","w","b"],
-            "D": ["e","e","e","e"],
-            "E": ["b","b","w"],
-            "F": ["w","b","b"],
+            "A": ["a","a","a","a"],
+            "B": ["a","a","a","a"],
+            "C": ["a","a","a","a"],
+            "D": ["a","a","a","a"],
+            "E": ["s","s","s"],
+            "F": ["s","s","s"],
             "G": ["s","s","s"],
             "H": ["s","s"],
             "I": ["s","s"],
@@ -66,7 +66,7 @@ class Board(object):
         }
 
         global board_list
-        board_list = actual_board
+        board_list = actual_board_test
 
         global last_move
         last_move = ["Z", 0]
@@ -837,17 +837,17 @@ class Machine(Player):
                         score = self.evaluate(boardlist, i[0], i[1], -beginscore)
                         if len(i) == 2:
                             if self.mrcheck(i[0], i[1], boardlist):
-                                self.minimax(boardlist, 0, theirpiece, mypiece, depth-1, score, 1)
+                                score = self.minimax(boardlist, 0, theirpiece, mypiece, depth-1, score, 1)[0]
                             else:
-                                self.minimax(boardlist, 1, theirpiece, mypiece, depth-1, score, 0)
+                                score = self.minimax(boardlist, 1, theirpiece, mypiece, depth-1, score, 0)[0]
                             self.mundoplace(i[0], i[1], boardlist)
                         elif len(i) == 4:
                             score = self.remevaluate(boardlist, i[2], i[3], score - 9)
                             self.mundoplace(i[2], i[3], boardlist)
                             if self.mrcheck(i[0], i[1], boardlist):
-                                self.minimax(boardlist, 0, theirpiece, mypiece, depth-1, score, 1)
+                                score = self.minimax(boardlist, 0, theirpiece, mypiece, depth-1, score, 1)[0]
                             else:
-                                self.minimax(boardlist, 1, theirpiece, mypiece, depth-1, score, 0)
+                                score = self.minimax(boardlist, 1, theirpiece, mypiece, depth-1, score, 0)[0]
                             self.mundoplace(i[0], i[1], boardlist)
                             self.mplace(i[2], i[3], mypiece, boardlist)
                         if score >= best[0]:
@@ -860,17 +860,17 @@ class Machine(Player):
                         score = -(self.evaluate(boardlist, i[0], i[1], beginscore))
                         if len(i) == 2:
                             if self.mrcheck(i[0], i[1], boardlist):
-                                self.minimax(boardlist, 1, theirpiece, mypiece, depth-1, score, 1)
+                                score = self.minimax(boardlist, 1, theirpiece, mypiece, depth-1, score, 1)[0]
                             else:
-                                self.minimax(boardlist, 0, theirpiece, mypiece, depth-1, -score, 0)
+                                score = self.minimax(boardlist, 0, theirpiece, mypiece, depth-1, -score, 0)[0]
                             self.mundoplace(i[0], i[1], boardlist)
                         elif len(i) == 4:
                             score = -(self.remevaluate(boardlist, i[2], i[3], -(score - 9)))
                             self.mundoplace(i[2], i[3], boardlist)
                             if self.mrcheck(i[0], i[1], boardlist):
-                                self.minimax(boardlist, 1, theirpiece, mypiece, depth-1, score, 1)
+                                score = self.minimax(boardlist, 1, theirpiece, mypiece, depth-1, score, 1)[0]
                             else:
-                                self.minimax(boardlist, 0, theirpiece, mypiece, depth-1, -score, 0)
+                                score = self.minimax(boardlist, 0, theirpiece, mypiece, depth-1, -score, 0)[0]
                             self.mundoplace(i[0], i[1], boardlist)
                             self.mplace(i[2], i[3], mypiece, boardlist)
                         if score <= best[0]:
@@ -900,7 +900,7 @@ class Machine(Player):
                     for i in movelist:
                         score = self.remevaluate(boardlist, i[0], i[1], beginscore)
                         self.mundoplace(i[0],i[1], boardlist)
-                        self.minimax(boardlist, 1, mypiece, theirpiece, depth-1, score, 2)
+                        score = self.minimax(boardlist, 1, mypiece, theirpiece, depth-1, score, 2)[0]
                         self.mplace(i[0], i[1], mypiece, boardlist)
                         if score >= best[0]:
                             best[0] = score
@@ -910,7 +910,7 @@ class Machine(Player):
                     for i in movelist:
                         score = -(self.remevaluate(boardlist, i[0], i[1], beginscore))
                         self.mundoplace(i[0],i[1], boardlist)
-                        self.minimax(boardlist, 0, mypiece, theirpiece, depth-1, score, 2)
+                        score = self.minimax(boardlist, 0, mypiece, theirpiece, depth-1, score, 2)[0]
                         self.mplace(i[0], i[1], mypiece, boardlist)
                         if score <= best[0]:
                             best[0] = score
@@ -947,11 +947,11 @@ class Machine(Player):
                     for i in movelist:
                         if i == "_":
                             score = self.remevaluate(boardlist, "", "", beginscore)
-                            self.minimax(boardlist, 1, theirpiece, mypiece, depth-1, score, 0)
+                            score = self.minimax(boardlist, 1, theirpiece, mypiece, depth-1, score, 0)[0]
                         else:
                             score = self.remevaluate(boardlist, i[0], i[1], beginscore)
                             self.mundoplace(i[0],i[1], boardlist)
-                            self.minimax(boardlist, 1, theirpiece, mypiece, depth-1, score, 0)
+                            score = self.minimax(boardlist, 1, theirpiece, mypiece, depth-1, score, 0)[0]
                             self.mplace(i[0], i[1], mypiece, boardlist)
                         if score >= best[0]:
                             best[0] = score
@@ -961,11 +961,11 @@ class Machine(Player):
                     for i in movelist:
                         if i == "_":
                             score = -(self.remevaluate(boardlist, "", "", -beginscore))
-                            self.minimax(boardlist, 0, theirpiece, mypiece, depth-1, score, 0)
+                            score = self.minimax(boardlist, 0, theirpiece, mypiece, depth-1, score, 0)[0]
                         else:
                             score = -(self.remevaluate(boardlist, i[0], i[1], -beginscore))
                             self.mundoplace(i[0],i[1], boardlist)
-                            self.minimax(boardlist, 0, theirpiece, mypiece, depth-1, score, 0)
+                            score = self.minimax(boardlist, 0, theirpiece, mypiece, depth-1, score, 0)[0]
                             self.mplace(i[0], i[1], mypiece, boardlist)
                         if score <= best[0]:
                             best[0] = score
@@ -2736,7 +2736,7 @@ class Machine(Player):
 
     def move(self, boardlist, mypiecenumber, theirpiecenumber, mypiece, theirpiece, flag):
         myboardlist = copy.deepcopy(boardlist)
-        check = self.minimax(myboardlist, 0, mypiece, theirpiece, 2, 0, flag)[1]
+        check = self.minimax(myboardlist, 0, mypiece, theirpiece, 3, 0, flag)[1]
         print("Machine player chooses:", end=" ")
         print(check)
         return check
