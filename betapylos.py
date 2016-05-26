@@ -7,8 +7,8 @@ import math
 class Board(object):
 
     def __init__(self, player1, player2):  # player1 begins the game, player1 is white
-        self.whitepieces = 7
-        self.blackpieces = 7
+        self.whitepieces = 15
+        self.blackpieces = 15
         self.white = player1  # white
         self.black = player2  # black
 
@@ -26,7 +26,22 @@ class Board(object):
             "G": ["s","s","s"],
             "H": ["s","s"],
             "I": ["s","s"],
-            "J": ["s"]
+            "J": ["s"],
+            "Z": ["e"]
+        }
+        global actual_board_test
+        actual_board_test = {
+            "A": ["w","w","w","e"],
+            "B": ["w","b","w","w"],
+            "C": ["b","b","w","b"],
+            "D": ["e","e","e","e"],
+            "E": ["b","b","w"],
+            "F": ["w","b","b"],
+            "G": ["s","s","s"],
+            "H": ["s","s"],
+            "I": ["s","s"],
+            "J": ["s"],
+            "Z": ["e"]
         }
         global simple_board
         simple_board = {
@@ -51,7 +66,7 @@ class Board(object):
         }
 
         global board_list
-        board_list = simpler_board
+        board_list = actual_board
 
         global last_move
         last_move = ["Z", 0]
@@ -60,9 +75,104 @@ class Board(object):
     def board_visual(self):
         self.board_update()
         print("")
-        print(board_list["E"], "   ", board_list["H"], "   ", board_list["J"])
-        print(board_list["F"], "   ", board_list["I"])
-        print(board_list["G"])
+        print("   0  1  2  3       0  1  2       0  1       0")
+        print("A:", end="")
+        for i in board_list["A"]:
+            print("[", end="")
+            if i == "e":
+                print(" ]", end="")
+            else:
+                print(i, end="]")
+        print("   E:", end="")
+        for i in board_list["E"]:
+            print("[", end="")
+            if i == "e":
+                print(" ]", end="")
+            elif i == "s":
+                print("X]", end="")
+            else:
+                print(i, end="]")
+        print("   H:", end="")
+        for i in board_list["H"]:
+            print("[", end="")
+            if i == "e":
+                print(" ]", end="")
+            elif i == "s":
+                print("X]", end="")
+            else:
+                print(i, end="]")
+        print("   J:", end="")
+        for i in board_list["J"]:
+            print("[", end="")
+            if i == "e":
+                print(" ]", end="")
+            elif i == "s":
+                print("X]", end="")
+            else:
+                print(i, end="]")
+        print("")
+        #-------------------------------#
+        print("B:", end="")
+        for i in board_list["B"]:
+            print("[", end="")
+            if i == "e":
+                print(" ]", end="")
+            else:
+                print(i, end="]")
+        print("   F:", end="")
+        for i in board_list["F"]:
+            print("[", end="")
+            if i == "e":
+                print(" ]", end="")
+            elif i == "s":
+                print("X]", end="")
+            else:
+                print(i, end="]")
+        print("   I:", end="")
+        for i in board_list["I"]:
+            print("[", end="")
+            if i == "e":
+                print(" ]", end="")
+            elif i == "s":
+                print("X]", end="")
+            else:
+                print(i, end="]")
+        print("")
+        #-------------------------------#
+        print("C:", end="")
+        for i in board_list["C"]:
+            print("[", end="")
+            if i == "e":
+                print(" ]", end="")
+            else:
+                print(i, end="]")
+        print("   G:", end="")
+        for i in board_list["G"]:
+            print("[", end="")
+            if i == "e":
+                print(" ]", end="")
+            elif i == "s":
+                print("X]", end="")
+            else:
+                print(i, end="]")
+        print("")
+        #-------------------------------#
+        print("D:", end="")
+        for i in board_list["D"]:
+            print("[", end="")
+            if i == "e":
+                print(" ]", end="")
+            else:
+                print(i, end="]")
+        print("")
+        print("|-------------------------------------------------------------|")
+        '''
+        print("")
+        print(board_list["A"], "   ", board_list["E"], "   ", board_list["H"], "   ", board_list["J"])
+        print(board_list["B"], "   ", board_list["F"], "   ", board_list["I"])
+        print(board_list["C"], "   ", board_list["G"])
+        print(board_list["D"], "   ", )
+        '''
 
     # Updates the board but unsealing positions on higher levels
     # or sealing them based on bottom positions
@@ -97,61 +207,215 @@ class Board(object):
         for v, w in board_list["F"][1:3], board_list["G"][1:3]:
             if v == "e" or w == "e" or v == "s" or w == "s":
                 board_list["I"][1] = "s"
+        # Unseals E[0]
+        if board_list["E"][0] == "s":
+            board_list["E"][0] = "e"
+        for v, w in board_list["A"][:2], board_list["B"][:2]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                board_list["E"][0] = "s"
+        # Unseals E[1]
+        if board_list["E"][1] == "s":
+            board_list["E"][1] = "e"
+        for v, w in board_list["A"][1:3], board_list["B"][1:3]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                board_list["E"][1] = "s"
+        # Unseals E[2]
+        if board_list["E"][2] == "s":
+            board_list["E"][2] = "e"
+        for v, w in board_list["A"][2:4], board_list["B"][2:4]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                board_list["E"][2] = "s"
+        # Unseals F[0]
+        if board_list["F"][0] == "s":
+            board_list["F"][0] = "e"
+        for v, w in board_list["B"][:2], board_list["C"][:2]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                board_list["F"][0] = "s"
+        # Unseals F[1]
+        if board_list["F"][1] == "s":
+            board_list["F"][1] = "e"
+        for v, w in board_list["B"][1:3], board_list["C"][1:3]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                board_list["F"][1] = "s"
+        # Unseals F[2]
+        if board_list["F"][2] == "s":
+            board_list["F"][2] = "e"
+        for v, w in board_list["B"][2:4], board_list["C"][2:4]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                board_list["F"][2] = "s"
+        # Unseals G[0]
+        if board_list["G"][0] == "s":
+            board_list["G"][0] = "e"
+        for v, w in board_list["C"][:2], board_list["D"][:2]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                board_list["G"][0] = "s"
+        # Unseals G[1]
+        if board_list["G"][1] == "s":
+            board_list["G"][1] = "e"
+        for v, w in board_list["C"][1:3], board_list["D"][1:3]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                board_list["G"][1] = "s"
+        # Unseals G[2]
+        if board_list["G"][2] == "s":
+            board_list["G"][2] = "e"
+        for v, w in board_list["C"][2:4], board_list["D"][2:4]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                board_list["G"][2] = "s"
 
     # Checks if a piece needs to be removed
     # @Returns True if a piece needs to be removed
     # @Returns False if otherwise
     def rcheck(self, letter, position):
         if board_list[letter][position] != "s" and board_list[letter][position] != "e":
+            # Level 0
+            if letter in ("A", "B", "C", "D"):
+                if board_list["A"][position] == board_list["B"][position] == board_list["C"][position] == board_list["D"][position]:
+                    return True
+                if board_list[letter][0] == board_list[letter][1] == board_list[letter][2] == board_list[letter][3]:
+                    return True
+                if letter == "A":
+                    if position == 0:
+                        if board_list["A"][0] == board_list["A"][1] == board_list["B"][0] == board_list["B"][1]:
+                            return True
+                    if position == 1:
+                        if board_list["A"][0] == board_list["A"][1] == board_list["B"][0] == board_list["B"][1]:
+                            return True
+                        if board_list["A"][1] == board_list["A"][2] == board_list["B"][1] == board_list["B"][2]:
+                            return True
+                    if position == 2:
+                        if board_list["A"][2] == board_list["A"][3] == board_list["B"][2] == board_list["B"][3]:
+                            return True
+                        if board_list["A"][1] == board_list["A"][2] == board_list["B"][1] == board_list["B"][2]:
+                            return True
+                    if position == 3:
+                        if board_list["A"][2] == board_list["A"][3] == board_list["B"][2] == board_list["B"][3]:
+                            return True
+                if letter == "B":
+                    if position == 0:
+                        if board_list["B"][0] == board_list["B"][1] == board_list["A"][0] == board_list["A"][1]:
+                            return True
+                        if board_list["B"][0] == board_list["B"][1] == board_list["C"][0] == board_list["C"][1]:
+                            return True
+                    if position == 1:
+                        if board_list["B"][0] == board_list["B"][1] == board_list["A"][0] == board_list["A"][1]:
+                            return True
+                        if board_list["B"][0] == board_list["B"][1] == board_list["C"][0] == board_list["C"][1]:
+                            return True
+                        if board_list["B"][1] == board_list["A"][1] == board_list["B"][2] == board_list["A"][2]:
+                            return True
+                        if board_list["B"][1] == board_list["C"][1] == board_list["B"][2] == board_list["C"][2]:
+                            return True
+                    if position == 2:
+                        if board_list["B"][1] == board_list["A"][1] == board_list["B"][2] == board_list["A"][2]:
+                            return True
+                        if board_list["B"][1] == board_list["C"][1] == board_list["B"][2] == board_list["C"][2]:
+                            return True
+                        if board_list["B"][2] == board_list["A"][2] == board_list["B"][3] == board_list["A"][3]:
+                            return True
+                        if board_list["B"][2] == board_list["C"][2] == board_list["B"][3] == board_list["C"][3]:
+                            return True
+                    if position == 3:
+                        if board_list["B"][2] == board_list["A"][2] == board_list["B"][3] == board_list["A"][3]:
+                            return True
+                        if board_list["B"][2] == board_list["C"][2] == board_list["B"][3] == board_list["C"][3]:
+                            return True
+                if letter == "C":
+                    if position == 0:
+                        if board_list["C"][0] == board_list["B"][0] == board_list["B"][1] == board_list["C"][1]:
+                            return True
+                        if board_list["C"][0] == board_list["D"][0] == board_list["D"][1] == board_list["C"][1]:
+                            return True
+                    if position == 1:
+                        if board_list["C"][0] == board_list["B"][0] == board_list["B"][1] == board_list["C"][1]:
+                            return True
+                        if board_list["C"][0] == board_list["D"][0] == board_list["D"][1] == board_list["C"][1]:
+                            return True
+                        if board_list["C"][1] == board_list["B"][1] == board_list["B"][2] == board_list["C"][2]:
+                            return True
+                        if board_list["C"][1] == board_list["C"][2] == board_list["D"][1] == board_list["D"][2]:
+                            return True
+                    if position == 2:
+                        if board_list["C"][1] == board_list["B"][1] == board_list["B"][2] == board_list["C"][2]:
+                            return True
+                        if board_list["C"][1] == board_list["C"][2] == board_list["D"][1] == board_list["D"][2]:
+                            return True
+                        if board_list["C"][2] == board_list["B"][2] == board_list["B"][2] == board_list["C"][3]:
+                            return True
+                        if board_list["C"][2] == board_list["C"][3] == board_list["D"][3] == board_list["D"][2]:
+                            return True
+                    if position == 3:
+                        if board_list["C"][2] == board_list["B"][2] == board_list["B"][3] == board_list["C"][3]:
+                            return True
+                        if board_list["C"][2] == board_list["C"][3] == board_list["D"][3] == board_list["D"][2]:
+                            return True
+                if letter == "D":
+                    if position == 0:
+                        if board_list["D"][0] == board_list["C"][0] == board_list["C"][1] == board_list["D"][1]:
+                            return True
+                    if position == 1:
+                        if board_list["D"][0] == board_list["C"][0] == board_list["C"][1] == board_list["D"][1]:
+                            return True
+                        if board_list["D"][1] == board_list["C"][1] == board_list["C"][2] == board_list["D"][2]:
+                            return True
+                    if position == 2:
+                        if board_list["D"][1] == board_list["C"][1] == board_list["C"][2] == board_list["D"][2]:
+                            return True
+                        if board_list["D"][2] == board_list["C"][2] == board_list["C"][3] == board_list["D"][3]:
+                            return True
+                    if position == 3:
+                        if board_list["D"][2] == board_list["C"][2] == board_list["C"][3] == board_list["D"][3]:
+                            return True
+            # Level 1
             if letter in ("E", "F", "G"):
                 if board_list["E"][position] == board_list["F"][position] == board_list["G"][position]:
                     return True
                 if board_list[letter][0] == board_list[letter][1] == board_list[letter][2]:
                     return True
-            if letter == "E":
-                if position == 0:
-                    if board_list["E"][0] == board_list["E"][1] == board_list["F"][0] == board_list["F"][1]:
-                        return True
-                if position == 2:
-                    if board_list["E"][1] == board_list["E"][2] == board_list["F"][1] == board_list["F"][2]:
-                        return True
-                if position == 1:
-                    if board_list["E"][0] == board_list["E"][1] == board_list["F"][0] == board_list["F"][1]:
-                        return True
-                    if board_list["E"][1] == board_list["E"][2] == board_list["F"][1] == board_list["F"][2]:
-                        return True
-            if letter == "F":
-                if position == 0:
-                    if board_list["E"][0] == board_list["E"][1] == board_list["F"][0] == board_list["F"][1]:
-                        return True
-                    if board_list["G"][0] == board_list["G"][1] == board_list["F"][0] == board_list["F"][1]:
-                        return True
-                if position == 2:
-                    if board_list["E"][1] == board_list["E"][2] == board_list["F"][1] == board_list["F"][2]:
-                        return True
-                    if board_list["G"][1] == board_list["G"][2] == board_list["F"][1] == board_list["F"][2]:
-                        return True
-                if position == 1:
-                    if board_list["E"][0] == board_list["E"][1] == board_list["F"][0] == board_list["F"][1]:
-                        return True
-                    if board_list["G"][0] == board_list["G"][1] == board_list["F"][0] == board_list["F"][1]:
-                        return True
-                    if board_list["E"][1] == board_list["E"][2] == board_list["F"][1] == board_list["F"][2]:
-                        return True
-                    if board_list["G"][1] == board_list["G"][2] == board_list["F"][1] == board_list["F"][2]:
-                        return True
-            if letter == "G":
-                if position == 0:
-                    if board_list["G"][0] == board_list["G"][1] == board_list["F"][0] == board_list["F"][1]:
-                        return True
-                if position == 2:
-                    if board_list["G"][1] == board_list["G"][2] == board_list["F"][1] == board_list["F"][2]:
-                        return True
-                if position == 1:
-                    if board_list["G"][0] == board_list["G"][1] == board_list["F"][0] == board_list["F"][1]:
-                        return True
-                    if board_list["G"][1] == board_list["G"][2] == board_list["F"][1] == board_list["F"][2]:
-                        return True
+                if letter == "E":
+                    if position == 0:
+                        if board_list["E"][0] == board_list["E"][1] == board_list["F"][0] == board_list["F"][1]:
+                            return True
+                    if position == 2:
+                        if board_list["E"][1] == board_list["E"][2] == board_list["F"][1] == board_list["F"][2]:
+                            return True
+                    if position == 1:
+                        if board_list["E"][0] == board_list["E"][1] == board_list["F"][0] == board_list["F"][1]:
+                            return True
+                        if board_list["E"][1] == board_list["E"][2] == board_list["F"][1] == board_list["F"][2]:
+                            return True
+                if letter == "F":
+                    if position == 0:
+                        if board_list["E"][0] == board_list["E"][1] == board_list["F"][0] == board_list["F"][1]:
+                            return True
+                        if board_list["G"][0] == board_list["G"][1] == board_list["F"][0] == board_list["F"][1]:
+                            return True
+                    if position == 2:
+                        if board_list["E"][1] == board_list["E"][2] == board_list["F"][1] == board_list["F"][2]:
+                            return True
+                        if board_list["G"][1] == board_list["G"][2] == board_list["F"][1] == board_list["F"][2]:
+                            return True
+                    if position == 1:
+                        if board_list["E"][0] == board_list["E"][1] == board_list["F"][0] == board_list["F"][1]:
+                            return True
+                        if board_list["G"][0] == board_list["G"][1] == board_list["F"][0] == board_list["F"][1]:
+                            return True
+                        if board_list["E"][1] == board_list["E"][2] == board_list["F"][1] == board_list["F"][2]:
+                            return True
+                        if board_list["G"][1] == board_list["G"][2] == board_list["F"][1] == board_list["F"][2]:
+                            return True
+                if letter == "G":
+                    if position == 0:
+                        if board_list["G"][0] == board_list["G"][1] == board_list["F"][0] == board_list["F"][1]:
+                            return True
+                    if position == 2:
+                        if board_list["G"][1] == board_list["G"][2] == board_list["F"][1] == board_list["F"][2]:
+                            return True
+                    if position == 1:
+                        if board_list["G"][0] == board_list["G"][1] == board_list["F"][0] == board_list["F"][1]:
+                            return True
+                        if board_list["G"][1] == board_list["G"][2] == board_list["F"][1] == board_list["F"][2]:
+                            return True
+            # Level 2
             if letter in ("H", "I"):
                 if board_list["H"][0] == board_list["H"][1] == board_list["I"][0] == board_list["I"][1]:
                     return True
@@ -162,7 +426,59 @@ class Board(object):
     # @Returns True if no piece stands on top of the position
     # @Returns False if a piece is stacked on top of the position
     def canremove(self, letter, position):
-        if letter == "E":
+        if letter == "A":
+            if position == 0:
+                if board_list["E"][0] in ("s", "e"):
+                    return True
+            if position == 1:
+                if board_list["E"][0] in ("s", "e") and board_list["E"][1] in ("s", "e"):
+                    return True
+            if position == 2:
+                if board_list["E"][1] in ("s", "e") and board_list["E"][2] in ("s", "e"):
+                    return True
+            if position == 3:
+                if board_list["E"][2] in ("s", "e"):
+                    return True
+        elif letter == "B":
+            if position == 0:
+                if board_list["E"][0] in ("s", "e") and board_list["F"][0] in ("s", "e"):
+                    return True
+            if position == 1:
+                if board_list["E"][0] in ("s", "e") and board_list["F"][0] in ("s", "e") and board_list["E"][1] in ("s", "e") and board_list["F"][1] in ("s", "e"):
+                    return True
+            if position == 2:
+                if board_list["E"][1] in ("s", "e") and board_list["F"][1] in ("s", "e") and board_list["E"][2] in ("s", "e") and board_list["F"][2] in ("s", "e"):
+                    return True
+            if position == 3:
+                if board_list["E"][2] in ("s", "e") and board_list["F"][2] in ("s", "e"):
+                    return True
+        elif letter == "C":
+            if position == 0:
+                if board_list["F"][0] in ("s", "e") and board_list["G"][0] in ("s", "e"):
+                    return True
+            if position == 1:
+                if board_list["F"][0] in ("s", "e") and board_list["G"][0] in ("s", "e") and board_list["F"][1] in ("s", "e") and board_list["G"][1] in ("s", "e"):
+                    return True
+            if position == 2:
+                if board_list["F"][1] in ("s", "e") and board_list["F"][2] in ("s", "e") and board_list["G"][1] in ("s", "e") and board_list["G"][2] in ("s", "e"):
+                    return True
+            if position == 3:
+                if board_list["F"][2] in ("s", "e") and board_list["G"][2] in ("s", "e"):
+                    return True
+        elif letter == "D":
+            if position == 0:
+                if board_list["G"][0] in ("s", "e"):
+                    return True
+            if position == 1:
+                if board_list["G"][0] in ("s", "e") and  board_list["G"][1] in ("s", "e"):
+                    return True
+            if position == 2:
+                if board_list["G"][1] in ("s", "e") and  board_list["G"][2] in ("s", "e"):
+                    return True
+            if position == 3:
+                if board_list["G"][2] in ("s", "e"):
+                    return True
+        elif letter == "E":
             if position == 0:
                 if board_list["H"][0] in ("s", "e"):
                     return True
@@ -224,8 +540,6 @@ class Board(object):
         else:
             return False
 
-
-
     # Places piece on position
     # @returns True if successful
     # @returns False if otherwise
@@ -274,14 +588,18 @@ class Board(object):
     def checklevel(self, letter, letter2):
         num = 0
         num2 = 0
-        if letter in ("E", "F", "G"):
+        if letter in ("A", "B", "C", "D"):
+            num = 0
+        elif letter in ("E", "F", "G"):
             num = 1
         elif letter in ("H", "I"):
             num = 2
         else:
             print("Invalid input.")
             return False
-        if letter2 in ("E", "F", "G"):
+        if letter2 in ("A", "B", "C", "D"):
+            num2 = 0
+        elif letter2 in ("E", "F", "G"):
             num2 = 1
         elif letter2 in ("H", "I"):
             num2 = 2
@@ -932,7 +1250,7 @@ class Machine(Player):
                         if boardlist["C"][2] == boardlist["C"][3] == boardlist["D"][3] == boardlist["D"][2]:
                             return True
                     if position == 3:
-                        if boardlist["C"][2] == boardlist["B"][2] == boardlist["B"][2] == boardlist["C"][3]:
+                        if boardlist["C"][2] == boardlist["B"][2] == boardlist["B"][3] == boardlist["C"][3]:
                             return True
                         if boardlist["C"][2] == boardlist["C"][3] == boardlist["D"][3] == boardlist["D"][2]:
                             return True
@@ -1019,7 +1337,7 @@ class Machine(Player):
                 if boardlist["E"][0] in ("s", "e"):
                     return True
             if position == 1:
-                if boardlist["E"][0] in ("s", "e") and boardlist["E"][1] in in ("s", "e"):
+                if boardlist["E"][0] in ("s", "e") and boardlist["E"][1] in ("s", "e"):
                     return True
             if position == 2:
                 if boardlist["E"][1] in ("s", "e") and boardlist["E"][2] in ("s", "e"):
@@ -1109,6 +1427,7 @@ class Machine(Player):
         if self.mrcheck(letter, position, boardlist):
             score += 10
         ## stop them from winning
+        # Level 0
         if letter == "A":
             if position == 0:
                 if boardlist["A"][0] != boardlist["A"][1] and boardlist["A"][1] not in ["s","e"]:
@@ -1119,7 +1438,7 @@ class Machine(Player):
                 if boardlist["A"][0] != boardlist["B"][0] and boardlist["B"][0] not in ["s","e"]:
                     if boardlist["B"][0] == boardlist["C"][0] == boardlist["D"][0]:
                         score += 7
-            if position == 1:
+            elif position == 1:
                 if boardlist["A"][1] != boardlist["A"][0] and boardlist["A"][0] not in ["s","e"]:
                     if boardlist["A"][0] == boardlist["A"][2] == boardlist["A"][3]:
                         score += 7
@@ -1130,7 +1449,7 @@ class Machine(Player):
                         score += 7
                     if boardlist["B"][1] == boardlist["B"][2] == boardlist["A"][2]:
                         score += 7
-            if position == 2:
+            elif position == 2:
                 if boardlist["A"][2] != boardlist["A"][3] and boardlist["A"][3] not in ["s","e"]:
                     if boardlist["A"][3] == boardlist["A"][1] == boardlist["A"][0]:
                         score += 7
@@ -1141,8 +1460,167 @@ class Machine(Player):
                         score += 7
                     if boardlist["B"][2] == boardlist["B"][1] == boardlist["A"][1]:
                         score += 7
-            if position == 3:
-                #todo
+            elif position == 3:
+                if boardlist["A"][3] != boardlist["A"][2] and boardlist["A"][2] not in ["s","e"]:
+                    if boardlist["A"][2] == boardlist["A"][1] == boardlist["A"][0]:
+                        score += 7
+                    if boardlist["A"][2] == boardlist["B"][2] == boardlist["B"][3]:
+                        score += 7
+                if boardlist["A"][3] != boardlist["B"][3] and boardlist["B"][3] not in ["s","e"]:
+                    if boardlist["B"][3] == boardlist["C"][3] == boardlist["D"][3]:
+                        score += 7
+        elif letter == "B":
+            if position == 0:
+                if boardlist["B"][0] != boardlist["B"][1] and boardlist["B"][1] not in ["s","e"]:
+                    if boardlist["B"][1] == boardlist["B"][2] == boardlist["B"][3]:
+                        score += 7
+                    if boardlist["B"][1] == boardlist["A"][1] == boardlist["A"][0]:
+                        score += 7
+                    if boardlist["B"][1] == boardlist["C"][1] == boardlist["C"][0]:
+                        score += 7
+                if boardlist["B"][0] != boardlist["A"][0] and boardlist["A"][0] not in ["s","e"]:
+                    if boardlist["A"][0] == boardlist["C"][0] == boardlist["D"][0]:
+                        score += 7
+            elif position == 1:
+                if boardlist["B"][1] != boardlist["A"][1] and boardlist["A"][1] not in ["s","e"]:
+                    if boardlist["A"][1] == boardlist["C"][1] == boardlist["D"][1]:
+                        score += 7
+                    if boardlist["A"][1] == boardlist["A"][0] == boardlist["B"][0]:
+                        score += 7
+                    if boardlist["A"][1] == boardlist["A"][2] == boardlist["B"][2]:
+                        score += 7
+                if boardlist["B"][1] != boardlist["C"][1] and boardlist["C"][1] not in ["s","e"]:
+                    if boardlist["C"][1] == boardlist["C"][0] == boardlist["B"][0]:
+                        score += 7
+                    if boardlist["C"][1] == boardlist["C"][2] == boardlist["B"][2]:
+                        score += 7
+                if boardlist["B"][1] != boardlist["B"][0] and boardlist["B"][0] not in ["s","e"]:
+                    if boardlist["B"][0] == boardlist["B"][2] == boardlist["B"][3]:
+                        score += 7
+            elif position == 2:
+                if boardlist["B"][2] != boardlist["A"][2] and boardlist["A"][2] not in ["s","e"]:
+                    if boardlist["A"][2] == boardlist["C"][2] == boardlist["D"][2]:
+                        score += 7
+                    if boardlist["A"][2] == boardlist["A"][1] == boardlist["B"][1]:
+                        score += 7
+                    if boardlist["A"][2] == boardlist["A"][3] == boardlist["B"][3]:
+                        score += 7
+                if boardlist["B"][2] != boardlist["C"][2] and boardlist["C"][2] not in ["s","e"]:
+                    if boardlist["C"][2] == boardlist["C"][1] == boardlist["B"][1]:
+                        score += 7
+                    if boardlist["C"][2] == boardlist["C"][3] == boardlist["B"][3]:
+                        score += 7
+                if boardlist["B"][2] != boardlist["B"][1] and boardlist["B"][1] not in ["s","e"]:
+                    if boardlist["B"][1] == boardlist["B"][0] == boardlist["B"][3]:
+                        score += 7
+            elif position == 3:
+                if boardlist["B"][3] != boardlist["B"][2] and boardlist["B"][2] not in ["s","e"]:
+                    if boardlist["B"][2] == boardlist["B"][1] == boardlist["B"][0]:
+                        score += 7
+                    if boardlist["B"][2] == boardlist["A"][2] == boardlist["A"][3]:
+                        score += 7
+                    if boardlist["B"][2] == boardlist["C"][2] == boardlist["C"][3]:
+                        score += 7
+                if boardlist["B"][3] != boardlist["C"][3] and boardlist["C"][3] not in ["s","e"]:
+                    if boardlist["C"][3] == boardlist["A"][3] == boardlist["D"][3]:
+                        score += 7
+        elif letter == "C":
+            if position == 0:
+                if boardlist["C"][0] != boardlist["C"][1] and boardlist["C"][1] not in ["s","e"]:
+                    if boardlist["C"][1] == boardlist["C"][2] == boardlist["C"][3]:
+                        score += 7
+                    if boardlist["C"][1] == boardlist["B"][1] == boardlist["B"][0]:
+                        score += 7
+                    if boardlist["C"][1] == boardlist["D"][1] == boardlist["D"][0]:
+                        score += 7
+                if boardlist["C"][0] != boardlist["B"][0] and boardlist["B"][0] not in ["s","e"]:
+                    if boardlist["B"][0] == boardlist["A"][0] == boardlist["D"][0]:
+                        score += 7
+            elif position == 1:
+                if boardlist["C"][1] != boardlist["B"][1] and boardlist["B"][1] not in ["s","e"]:
+                    if boardlist["B"][1] == boardlist["A"][1] == boardlist["D"][1]:
+                        score += 7
+                    if boardlist["B"][1] == boardlist["B"][0] == boardlist["C"][0]:
+                        score += 7
+                    if boardlist["B"][1] == boardlist["B"][2] == boardlist["C"][2]:
+                        score += 7
+                if boardlist["C"][1] != boardlist["D"][1] and boardlist["D"][1] not in ["s","e"]:
+                    if boardlist["D"][1] == boardlist["D"][0] == boardlist["C"][0]:
+                        score += 7
+                    if boardlist["D"][1] == boardlist["D"][2] == boardlist["C"][2]:
+                        score += 7
+                if boardlist["C"][1] != boardlist["C"][2] and boardlist["C"][2] not in ["s","e"]:
+                    if boardlist["C"][2] == boardlist["C"][3] == boardlist["C"][0]:
+                        score += 7
+            elif position == 2:
+                if boardlist["C"][2] != boardlist["B"][2] and boardlist["B"][2] not in ["s","e"]:
+                    if boardlist["B"][2] == boardlist["A"][2] == boardlist["D"][2]:
+                        score += 7
+                    if boardlist["B"][2] == boardlist["B"][1] == boardlist["C"][1]:
+                        score += 7
+                    if boardlist["B"][2] == boardlist["B"][3] == boardlist["C"][2]:
+                        score += 7
+                if boardlist["C"][2] != boardlist["D"][2] and boardlist["D"][2] not in ["s","e"]:
+                    if boardlist["D"][2] == boardlist["D"][1] == boardlist["C"][1]:
+                        score += 7
+                    if boardlist["D"][2] == boardlist["D"][3] == boardlist["C"][3]:
+                        score += 7
+                if boardlist["C"][2] != boardlist["C"][1] and boardlist["C"][1] not in ["s","e"]:
+                    if boardlist["C"][1] == boardlist["C"][3] == boardlist["C"][0]:
+                        score += 7
+            elif position == 3:
+                if boardlist["C"][3] != boardlist["C"][2] and boardlist["C"][2] not in ["s","e"]:
+                    if boardlist["C"][2] == boardlist["C"][1] == boardlist["C"][0]:
+                        score += 7
+                    if boardlist["C"][2] == boardlist["B"][2] == boardlist["B"][3]:
+                        score += 7
+                    if boardlist["C"][2] == boardlist["D"][2] == boardlist["D"][3]:
+                        score += 7
+                if boardlist["C"][3] != boardlist["B"][3] and boardlist["B"][3] not in ["s","e"]:
+                    if boardlist["B"][3] == boardlist["A"][3] == boardlist["D"][3]:
+                        score += 7
+        elif letter == "D":
+            if position == 0:
+                if boardlist["D"][0] != boardlist["C"][0] and boardlist["C"][0] not in ["s","e"]:
+                    if boardlist["C"][0] == boardlist["B"][0] == boardlist["A"][0]:
+                        score += 7
+                    if boardlist["C"][0] == boardlist["C"][1] == boardlist["D"][1]:
+                        score += 7
+                if boardlist["D"][0] != boardlist["D"][1] and boardlist["D"][1] not in ["s","e"]:
+                    if boardlist["D"][1] == boardlist["D"][2] == boardlist["D"][3]:
+                        score += 7
+            elif position == 1:
+                if boardlist["D"][1] != boardlist["C"][1] and boardlist["C"][1] not in ["s","e"]:
+                    if boardlist["C"][1] == boardlist["B"][1] == boardlist["A"][1]:
+                        score += 7
+                    if boardlist["C"][1] == boardlist["C"][0] == boardlist["D"][0]:
+                        score += 7
+                    if boardlist["C"][1] == boardlist["C"][2] == boardlist["D"][2]:
+                        score += 7
+                if boardlist["D"][1] != boardlist["D"][2] and boardlist["D"][2] not in ["s","e"]:
+                    if boardlist["D"][2] == boardlist["D"][3] == boardlist["D"][0]:
+                        score += 7
+            elif position == 2:
+                if boardlist["D"][2] != boardlist["C"][2] and boardlist["C"][2] not in ["s","e"]:
+                    if boardlist["C"][2] == boardlist["B"][2] == boardlist["A"][2]:
+                        score += 7
+                    if boardlist["C"][2] == boardlist["C"][1] == boardlist["D"][1]:
+                        score += 7
+                    if boardlist["C"][2] == boardlist["C"][3] == boardlist["D"][3]:
+                        score += 7
+                if boardlist["D"][2] != boardlist["D"][3] and boardlist["D"][3] not in ["s","e"]:
+                    if boardlist["D"][3] == boardlist["D"][1] == boardlist["D"][0]:
+                        score += 7
+            elif position == 3:
+                if boardlist["D"][3] != boardlist["D"][2] and boardlist["D"][2] not in ["s","e"]:
+                    if boardlist["D"][2] == boardlist["D"][1] == boardlist["D"][0]:
+                        score += 7
+                    if boardlist["D"][2] == boardlist["C"][2] == boardlist["C"][3]:
+                        score += 7
+                if boardlist["D"][3] != boardlist["C"][3] and boardlist["C"][3] not in ["s","e"]:
+                    if boardlist["C"][3] == boardlist["B"][3] == boardlist["A"][3]:
+                        score += 7
+        # Level 1
         elif letter == "E":
             if position == 0:
                 if boardlist["E"][0] != boardlist["E"][1] and boardlist["E"][1] not in ["s","e"]:
@@ -1242,9 +1720,498 @@ class Machine(Player):
                 if boardlist["G"][2] != boardlist["G"][1] and boardlist["G"][1] not in ["s", "e"]:
                     if boardlist["G"][1] == boardlist["G"][0]:
                         score += 7
-
+        ##
         ## Lets get closer to winning position
-        if letter == "E":
+        ##
+        # Level 0
+        if letter == "A":
+            if position == 0:
+                if boardlist["A"][0] == boardlist["A"][1]:
+                    score += 2
+                    if boardlist["A"][1] == boardlist["A"][2]:
+                        score += 2
+                        return score
+                    if boardlist["A"][1] == boardlist["B"][1]:
+                        score += 2
+                        return score
+                if boardlist["A"][0] == boardlist["B"][0]:
+                    score += 2
+                    if boardlist["B"][0] == boardlist["C"][0]:
+                        score += 2
+                        return score
+                    if boardlist["B"][0] == boardlist["B"][1]:
+                        score += 2
+                        return score
+            elif position == 1:
+                score += 1
+                if boardlist["A"][1] == boardlist["A"][2]:
+                    score += 2
+                    if boardlist["A"][2] == boardlist["A"][0]:
+                        score += 2
+                        return score
+                    if boardlist["A"][2] == boardlist["A"][3]:
+                        score += 2
+                        return score
+                    if boardlist["A"][2] == boardlist["B"][2]:
+                        score += 2
+                        return score
+                if boardlist["A"][1] == boardlist["B"][1]:
+                    score += 2
+                    if boardlist["B"][1] == boardlist["B"][2]:
+                        score += 2
+                        return score
+                    if boardlist["B"][1] == boardlist["B"][0]:
+                        score += 2
+                        return score
+                    if boardlist["B"][1] == boardlist["C"][1]:
+                        score += 2
+                        return score
+                if boardlist["A"][1] == boardlist["A"][0]:
+                    score += 2
+                    if boardlist["A"][0] == boardlist["B"][0]:
+                        score += 2
+                        return score
+            elif position == 2:
+                score += 1
+                if boardlist["A"][2] == boardlist["A"][1]:
+                    score += 2
+                    if boardlist["A"][1] == boardlist["A"][0]:
+                        score += 2
+                        return score
+                    if boardlist["A"][1] == boardlist["B"][1]:
+                        score += 2
+                        return score
+                if boardlist["A"][2] == boardlist["B"][2]:
+                    score += 2
+                    if boardlist["B"][2] == boardlist["C"][2]:
+                        score += 2
+                        return score
+                    if boardlist["B"][2] == boardlist["B"][1]:
+                        score += 2
+                        return score
+                    if boardlist["B"][2] == boardlist["B"][3]:
+                        score += 2
+                        return score
+                if boardlist["A"][2] == boardlist["A"][3]:
+                    score += 2
+                    if boardlist["A"][3] == boardlist["B"][3]:
+                        score += 2
+                        return score
+                    if boardlist["A"][3] == boardlist["A"][1]:
+                        score += 2
+                        return score
+            elif position == 3:
+                if boardlist["A"][3] == boardlist["A"][2]:
+                    score += 2
+                    if boardlist["A"][2] == boardlist["A"][1]:
+                        score += 2
+                        return score
+                    if boardlist["A"][2] == boardlist["B"][2]:
+                        score += 2
+                        return score
+                if boardlist["A"][3] == boardlist["B"][3]:
+                    score += 2
+                    if boardlist["B"][3] == boardlist["B"][2]:
+                        score += 2
+                        return score
+                    if boardlist["B"][3] == boardlist["C"][3]:
+                        score += 2
+                        return score
+        elif letter == "B":
+            score += 1
+            if position == 0:
+                if boardlist["B"][0] == boardlist["B"][1]:
+                    score += 2
+                    if boardlist["B"][1] == boardlist["B"][2]:
+                        score += 2
+                        return score
+                    if boardlist["B"][1] == boardlist["A"][1]:
+                        score += 2
+                        return score
+                    if boardlist["B"][1] == boardlist["C"][1]:
+                        score += 2
+                        return score
+                if boardlist["B"][0] == boardlist["A"][0]:
+                    score += 2
+                    if boardlist["A"][0] == boardlist["C"][0]:
+                        score += 2
+                        return score
+                    if boardlist["A"][0] == boardlist["A"][1]:
+                        score += 2
+                        return score
+                if boardlist["B"][0] == boardlist["C"][0]:
+                    score += 2
+                    if boardlist["C"][0] == boardlist["D"][0]:
+                        score += 2
+                        return score
+                    if boardlist["C"][0] == boardlist["C"][1]:
+                        score += 2
+                        return score
+            elif position == 1:
+                score += 1
+                if boardlist["B"][1] == boardlist["A"][1]:
+                    score += 2
+                    if boardlist["A"][1] == boardlist["C"][1]:
+                        score += 2
+                        return score
+                    if boardlist["A"][1] == boardlist["A"][0]:
+                        score += 2
+                        return score
+                    if boardlist["A"][1] == boardlist["A"][2]:
+                        score += 2
+                        return score
+                if boardlist["B"][1] == boardlist["B"][0]:
+                    score += 2
+                    if boardlist["B"][0] == boardlist["B"][2]:
+                        score += 2
+                        return score
+                    if boardlist["B"][0] == boardlist["C"][0]:
+                        score += 2
+                        return score
+                    if boardlist["B"][0] == boardlist["A"][0]:
+                        score += 2
+                        return score
+                if boardlist["B"][1] == boardlist["B"][2]:
+                    score += 2
+                    if boardlist["B"][2] == boardlist["A"][2]:
+                        score += 2
+                        return score
+                    if boardlist["B"][2] == boardlist["B"][3]:
+                        score += 2
+                        return score
+                    if boardlist["B"][2] == boardlist["C"][2]:
+                        score += 2
+                        return score
+                if boardlist["B"][1] == boardlist["C"][1]:
+                    score += 2
+                    if boardlist["C"][1] == boardlist["D"][1]:
+                        score += 2
+                        return score
+                    if boardlist["C"][1] == boardlist["C"][0]:
+                        score += 2
+                        return score
+                    if boardlist["C"][1] == boardlist["C"][2]:
+                        score += 2
+                        return score
+            elif position == 2:
+                score += 1
+                if boardlist["B"][2] == boardlist["A"][2]:
+                    score += 2
+                    if boardlist["A"][2] == boardlist["C"][2]:
+                        score += 2
+                        return score
+                    if boardlist["A"][2] == boardlist["A"][1]:
+                        score += 2
+                        return score
+                    if boardlist["A"][2] == boardlist["A"][3]:
+                        score += 2
+                        return score
+                if boardlist["B"][2] == boardlist["B"][1]:
+                    score += 2
+                    if boardlist["B"][1] == boardlist["B"][3]:
+                        score += 2
+                        return score
+                    if boardlist["B"][1] == boardlist["C"][1]:
+                        score += 2
+                        return score
+                    if boardlist["B"][1] == boardlist["A"][1]:
+                        score += 2
+                        return score
+                if boardlist["B"][2] == boardlist["B"][3]:
+                    score += 2
+                    if boardlist["B"][3] == boardlist["A"][3]:
+                        score += 2
+                        return score
+                    if boardlist["B"][3] == boardlist["B"][2]:
+                        score += 2
+                        return score
+                    if boardlist["B"][3] == boardlist["C"][3]:
+                        score += 2
+                        return score
+                if boardlist["B"][2] == boardlist["C"][2]:
+                    score += 2
+                    if boardlist["C"][2] == boardlist["D"][2]:
+                        score += 2
+                        return score
+                    if boardlist["C"][2] == boardlist["C"][1]:
+                        score += 2
+                        return score
+                    if boardlist["C"][2] == boardlist["C"][3]:
+                        score += 2
+                        return score
+            elif position == 3:
+                if boardlist["B"][3] == boardlist["A"][3]:
+                    score += 2
+                    if boardlist["A"][3] == boardlist["A"][2]:
+                        score += 2
+                        return score
+                    if boardlist["A"][3] == boardlist["C"][3]:
+                        score += 2
+                        return score
+                if boardlist["B"][3] == boardlist["B"][2]:
+                    score += 2
+                    if boardlist["B"][2] == boardlist["B"][1]:
+                        score += 2
+                        return score
+                    if boardlist["B"][2] == boardlist["A"][1]:
+                        score += 2
+                        return score
+                    if boardlist["B"][2] == boardlist["C"][2]:
+                        score += 2
+                        return score
+                if boardlist["B"][3] == boardlist["C"][3]:
+                    score += 2
+                    if boardlist["C"][3] == boardlist["D"][3]:
+                        score += 2
+                        return score
+                    if boardlist["C"][3] == boardlist["C"][2]:
+                        score += 2
+                        return score
+        elif letter == "C":
+            score += 1
+            if position == 0:
+                if boardlist["C"][0] == boardlist["C"][1]:
+                    score += 2
+                    if boardlist["C"][1] == boardlist["C"][2]:
+                        score += 2
+                        return score
+                    if boardlist["C"][1] == boardlist["B"][1]:
+                        score += 2
+                        return score
+                    if boardlist["C"][1] == boardlist["D"][1]:
+                        score += 2
+                        return score
+                if boardlist["C"][0] == boardlist["B"][0]:
+                    score += 2
+                    if boardlist["B"][0] == boardlist["D"][0]:
+                        score += 2
+                        return score
+                    if boardlist["B"][0] == boardlist["B"][1]:
+                        score += 2
+                        return score
+                if boardlist["C"][0] == boardlist["D"][0]:
+                    score += 2
+                    if boardlist["D"][0] == boardlist["B"][0]:
+                        score += 2
+                        return score
+                    if boardlist["D"][0] == boardlist["D"][1]:
+                        score += 2
+                        return score
+            elif position == 1:
+                score += 1
+                if boardlist["C"][1] == boardlist["B"][1]:
+                    score += 2
+                    if boardlist["B"][1] == boardlist["D"][1]:
+                        score += 2
+                        return score
+                    if boardlist["B"][1] == boardlist["B"][0]:
+                        score += 2
+                        return score
+                    if boardlist["B"][1] == boardlist["B"][2]:
+                        score += 2
+                        return score
+                if boardlist["C"][1] == boardlist["C"][0]:
+                    score += 2
+                    if boardlist["C"][0] == boardlist["C"][2]:
+                        score += 2
+                        return score
+                    if boardlist["C"][0] == boardlist["D"][0]:
+                        score += 2
+                        return score
+                    if boardlist["C"][0] == boardlist["B"][0]:
+                        score += 2
+                        return score
+                if boardlist["C"][1] == boardlist["C"][2]:
+                    score += 2
+                    if boardlist["C"][2] == boardlist["B"][2]:
+                        score += 2
+                        return score
+                    if boardlist["C"][2] == boardlist["C"][3]:
+                        score += 2
+                        return score
+                    if boardlist["C"][2] == boardlist["D"][2]:
+                        score += 2
+                        return score
+                if boardlist["C"][1] == boardlist["D"][1]:
+                    score += 2
+                    if boardlist["D"][1] == boardlist["B"][1]:
+                        score += 2
+                        return score
+                    if boardlist["D"][1] == boardlist["D"][0]:
+                        score += 2
+                        return score
+                    if boardlist["D"][1] == boardlist["D"][2]:
+                        score += 2
+                        return score
+            elif position == 2:
+                score += 1
+                if boardlist["C"][2] == boardlist["B"][2]:
+                    score += 2
+                    if boardlist["B"][2] == boardlist["D"][2]:
+                        score += 2
+                        return score
+                    if boardlist["B"][2] == boardlist["B"][1]:
+                        score += 2
+                        return score
+                    if boardlist["B"][2] == boardlist["B"][3]:
+                        score += 2
+                        return score
+                if boardlist["C"][2] == boardlist["C"][1]:
+                    score += 2
+                    if boardlist["C"][1] == boardlist["C"][3]:
+                        score += 2
+                        return score
+                    if boardlist["C"][1] == boardlist["D"][1]:
+                        score += 2
+                        return score
+                    if boardlist["C"][1] == boardlist["B"][1]:
+                        score += 2
+                        return score
+                if boardlist["C"][2] == boardlist["C"][3]:
+                    score += 2
+                    if boardlist["C"][3] == boardlist["B"][3]:
+                        score += 2
+                        return score
+                    if boardlist["C"][3] == boardlist["C"][2]:
+                        score += 2
+                        return score
+                    if boardlist["C"][3] == boardlist["D"][3]:
+                        score += 2
+                        return score
+                if boardlist["C"][2] == boardlist["D"][2]:
+                    score += 2
+                    if boardlist["D"][2] == boardlist["B"][2]:
+                        score += 2
+                        return score
+                    if boardlist["D"][2] == boardlist["D"][1]:
+                        score += 2
+                        return score
+                    if boardlist["D"][2] == boardlist["D"][3]:
+                        score += 2
+                        return score
+            elif position == 3:
+                if boardlist["C"][3] == boardlist["B"][3]:
+                    score += 2
+                    if boardlist["B"][3] == boardlist["B"][2]:
+                        score += 2
+                        return score
+                    if boardlist["B"][3] == boardlist["D"][3]:
+                        score += 2
+                        return score
+                if boardlist["C"][3] == boardlist["C"][2]:
+                    score += 2
+                    if boardlist["C"][2] == boardlist["C"][1]:
+                        score += 2
+                        return score
+                    if boardlist["C"][2] == boardlist["B"][1]:
+                        score += 2
+                        return score
+                    if boardlist["C"][2] == boardlist["D"][2]:
+                        score += 2
+                        return score
+                if boardlist["C"][3] == boardlist["D"][3]:
+                    score += 2
+                    if boardlist["D"][3] == boardlist["B"][3]:
+                        score += 2
+                        return score
+                    if boardlist["D"][3] == boardlist["D"][2]:
+                        score += 2
+                        return score
+        elif letter == "D":
+            if position == 0:
+                if boardlist["D"][0] == boardlist["C"][0]:
+                    score += 2
+                    if boardlist["C"][0] == boardlist["B"][0]:
+                        score += 2
+                        return score
+                    if boardlist["C"][0] == boardlist["C"][1]:
+                        score += 2
+                        return score
+                if boardlist["D"][0] == boardlist["D"][1]:
+                    score += 2
+                    if boardlist["D"][1] == boardlist["C"][1]:
+                        score += 2
+                        return score
+                    if boardlist["D"][1] == boardlist["D"][2]:
+                        score += 2
+                        return score
+            elif position == 1:
+                score += 1
+                if boardlist["D"][1] == boardlist["D"][0]:
+                    score += 2
+                    if boardlist["D"][0] == boardlist["C"][0]:
+                        score += 2
+                        return score
+                    if boardlist["D"][0] == boardlist["D"][2]:
+                        score += 2
+                        return score
+                if boardlist["D"][1] == boardlist["C"][1]:
+                    score += 2
+                    if boardlist["C"][1] == boardlist["C"][0]:
+                        score += 2
+                        return score
+                    if boardlist["C"][1] == boardlist["B"][1]:
+                        score += 2
+                        return score
+                    if boardlist["C"][1] == boardlist["C"][2]:
+                        score += 2
+                        return score
+                if boardlist["D"][1] == boardlist["D"][2]:
+                    score += 2
+                    if boardlist["D"][2] == boardlist["C"][2]:
+                        score += 2
+                        return score
+                    if boardlist["D"][2] == boardlist["D"][3]:
+                        score += 2
+                        return score
+            elif position == 2:
+                score += 1
+                if boardlist["D"][2] == boardlist["D"][1]:
+                    score += 2
+                    if boardlist["D"][1] == boardlist["C"][1]:
+                        score += 2
+                        return score
+                    if boardlist["D"][1] == boardlist["D"][3]:
+                        score += 2
+                        return score
+                if boardlist["D"][2] == boardlist["C"][2]:
+                    score += 2
+                    if boardlist["C"][2] == boardlist["C"][1]:
+                        score += 2
+                        return score
+                    if boardlist["C"][2] == boardlist["B"][2]:
+                        score += 2
+                        return score
+                    if boardlist["C"][2] == boardlist["C"][3]:
+                        score += 2
+                        return score
+                if boardlist["D"][2] == boardlist["D"][3]:
+                    score += 2
+                    if boardlist["D"][3] == boardlist["C"][3]:
+                        score += 2
+                        return score
+                    if boardlist["D"][3] == boardlist["D"][1]:
+                        score += 2
+                        return score
+            elif position == 3:
+                if boardlist["D"][3] == boardlist["C"][3]:
+                    score += 2
+                    if boardlist["C"][3] == boardlist["B"][3]:
+                        score += 2
+                        return score
+                    if boardlist["C"][3] == boardlist["C"][2]:
+                        score += 2
+                        return score
+                if boardlist["D"][3] == boardlist["D"][2]:
+                    score += 2
+                    if boardlist["D"][2] == boardlist["D"][1]:
+                        score += 2
+                        return score
+                    if boardlist["D"][2] == boardlist["C"][2]:
+                        score += 2
+                        return score
+        # Level 1
+        elif letter == "E":
             if position == 0:
                 if boardlist["E"][0] == boardlist["E"][1]:
                     score += 3
@@ -1453,7 +2420,211 @@ class Machine(Player):
             return score
         if self.mrcheck(letter, position, boardlist):
             score += 3
-        if letter == "E":
+        # Level 0
+        if letter == "A":
+            if position == 0:
+                if boardlist["A"][0] != boardlist["A"][1] and boardlist["A"][1] not in ["s","e"]:
+                    if boardlist["A"][1] == boardlist["A"][2] == boardlist["A"][3]:
+                        score -= 3
+                    if boardlist["A"][1] == boardlist["B"][1] == boardlist["B"][0]:
+                        score +=7
+                if boardlist["A"][0] != boardlist["B"][0] and boardlist["B"][0] not in ["s","e"]:
+                    if boardlist["B"][0] == boardlist["C"][0] == boardlist["D"][0]:
+                        score -= 3
+            elif position == 1:
+                score -= 1
+                if boardlist["A"][1] != boardlist["A"][0] and boardlist["A"][0] not in ["s","e"]:
+                    if boardlist["A"][0] == boardlist["A"][2] == boardlist["A"][3]:
+                        score -= 3
+                    if boardlist["A"][0] == boardlist["B"][0] == boardlist["B"][1]:
+                        score -= 3
+                if boardlist["A"][1] != boardlist["B"][1] and boardlist["B"][1] not in ["s","e"]:
+                    if boardlist["B"][1] == boardlist["C"][1] == boardlist["D"][1]:
+                        score -= 3
+                    if boardlist["B"][1] == boardlist["B"][2] == boardlist["A"][2]:
+                        score -= 3
+            elif position == 2:
+                score -= 1
+                if boardlist["A"][2] != boardlist["A"][3] and boardlist["A"][3] not in ["s","e"]:
+                    if boardlist["A"][3] == boardlist["A"][1] == boardlist["A"][0]:
+                        score -= 3
+                    if boardlist["A"][3] == boardlist["B"][3] == boardlist["B"][2]:
+                        score -= 3
+                if boardlist["A"][2] != boardlist["B"][2] and boardlist["B"][2] not in ["s","e"]:
+                    if boardlist["B"][2] == boardlist["C"][2] == boardlist["D"][2]:
+                        score -= 3
+                    if boardlist["B"][2] == boardlist["B"][1] == boardlist["A"][1]:
+                        score -= 3
+            elif position == 3:
+                if boardlist["A"][3] != boardlist["A"][2] and boardlist["A"][2] not in ["s","e"]:
+                    if boardlist["A"][2] == boardlist["A"][1] == boardlist["A"][0]:
+                        score -= 3
+                    if boardlist["A"][2] == boardlist["B"][2] == boardlist["B"][3]:
+                        score -= 3
+                if boardlist["A"][3] != boardlist["B"][3] and boardlist["B"][3] not in ["s","e"]:
+                    if boardlist["B"][3] == boardlist["C"][3] == boardlist["D"][3]:
+                        score -= 3
+        elif letter == "B":
+            score -= 1
+            if position == 0:
+                if boardlist["B"][0] != boardlist["B"][1] and boardlist["B"][1] not in ["s","e"]:
+                    if boardlist["B"][1] == boardlist["B"][2] == boardlist["B"][3]:
+                        score -= 3
+                    if boardlist["B"][1] == boardlist["A"][1] == boardlist["A"][0]:
+                        score -= 3
+                    if boardlist["B"][1] == boardlist["C"][1] == boardlist["C"][0]:
+                        score -= 3
+                if boardlist["B"][0] != boardlist["A"][0] and boardlist["A"][0] not in ["s","e"]:
+                    if boardlist["A"][0] == boardlist["C"][0] == boardlist["D"][0]:
+                        score -= 3
+            elif position == 1:
+                score -= 1
+                if boardlist["B"][1] != boardlist["A"][1] and boardlist["A"][1] not in ["s","e"]:
+                    if boardlist["A"][1] == boardlist["C"][1] == boardlist["D"][1]:
+                        score -= 3
+                    if boardlist["A"][1] == boardlist["A"][0] == boardlist["B"][0]:
+                        score -= 3
+                    if boardlist["A"][1] == boardlist["A"][2] == boardlist["B"][2]:
+                        score -= 3
+                if boardlist["B"][1] != boardlist["C"][1] and boardlist["C"][1] not in ["s","e"]:
+                    if boardlist["C"][1] == boardlist["C"][0] == boardlist["B"][0]:
+                        score -= 3
+                    if boardlist["C"][1] == boardlist["C"][2] == boardlist["B"][2]:
+                        score -= 3
+                if boardlist["B"][1] != boardlist["B"][0] and boardlist["B"][0] not in ["s","e"]:
+                    if boardlist["B"][0] == boardlist["B"][2] == boardlist["B"][3]:
+                        score -= 3
+            elif position == 2:
+                score -= 1
+                if boardlist["B"][2] != boardlist["A"][2] and boardlist["A"][2] not in ["s","e"]:
+                    if boardlist["A"][2] == boardlist["C"][2] == boardlist["D"][2]:
+                        score -= 3
+                    if boardlist["A"][2] == boardlist["A"][1] == boardlist["B"][1]:
+                        score -= 3
+                    if boardlist["A"][2] == boardlist["A"][3] == boardlist["B"][3]:
+                        score -= 3
+                if boardlist["B"][2] != boardlist["C"][2] and boardlist["C"][2] not in ["s","e"]:
+                    if boardlist["C"][2] == boardlist["C"][1] == boardlist["B"][1]:
+                        score -= 3
+                    if boardlist["C"][2] == boardlist["C"][3] == boardlist["B"][3]:
+                        score -= 3
+                if boardlist["B"][2] != boardlist["B"][1] and boardlist["B"][1] not in ["s","e"]:
+                    if boardlist["B"][1] == boardlist["B"][0] == boardlist["B"][3]:
+                        score -= 3
+            elif position == 3:
+                if boardlist["B"][3] != boardlist["B"][2] and boardlist["B"][2] not in ["s","e"]:
+                    if boardlist["B"][2] == boardlist["B"][1] == boardlist["B"][0]:
+                        score -= 3
+                    if boardlist["B"][2] == boardlist["A"][2] == boardlist["A"][3]:
+                        score -= 3
+                    if boardlist["B"][2] == boardlist["C"][2] == boardlist["C"][3]:
+                        score -= 3
+                if boardlist["B"][3] != boardlist["C"][3] and boardlist["C"][3] not in ["s","e"]:
+                    if boardlist["C"][3] == boardlist["A"][3] == boardlist["D"][3]:
+                        score -= 3
+        elif letter == "C":
+            score -= 1
+            if position == 0:
+                if boardlist["C"][0] != boardlist["C"][1] and boardlist["C"][1] not in ["s","e"]:
+                    if boardlist["C"][1] == boardlist["C"][2] == boardlist["C"][3]:
+                        score -= 3
+                    if boardlist["C"][1] == boardlist["B"][1] == boardlist["B"][0]:
+                        score -= 3
+                    if boardlist["C"][1] == boardlist["D"][1] == boardlist["D"][0]:
+                        score -= 3
+                if boardlist["C"][0] != boardlist["B"][0] and boardlist["B"][0] not in ["s","e"]:
+                    if boardlist["B"][0] == boardlist["A"][0] == boardlist["D"][0]:
+                        score -= 3
+            elif position == 1:
+                score -= 1
+                if boardlist["C"][1] != boardlist["B"][1] and boardlist["B"][1] not in ["s","e"]:
+                    if boardlist["B"][1] == boardlist["A"][1] == boardlist["D"][1]:
+                        score -= 3
+                    if boardlist["B"][1] == boardlist["B"][0] == boardlist["C"][0]:
+                        score -= 3
+                    if boardlist["B"][1] == boardlist["B"][2] == boardlist["C"][2]:
+                        score -= 3
+                if boardlist["C"][1] != boardlist["D"][1] and boardlist["D"][1] not in ["s","e"]:
+                    if boardlist["D"][1] == boardlist["D"][0] == boardlist["C"][0]:
+                        score -= 3
+                    if boardlist["D"][1] == boardlist["D"][2] == boardlist["C"][2]:
+                        score -= 3
+                if boardlist["C"][1] != boardlist["C"][2] and boardlist["C"][2] not in ["s","e"]:
+                    if boardlist["C"][2] == boardlist["C"][3] == boardlist["C"][0]:
+                        score -= 3
+            elif position == 2:
+                score -= 1
+                if boardlist["C"][2] != boardlist["B"][2] and boardlist["B"][2] not in ["s","e"]:
+                    if boardlist["B"][2] == boardlist["A"][2] == boardlist["D"][2]:
+                        score -= 3
+                    if boardlist["B"][2] == boardlist["B"][1] == boardlist["C"][1]:
+                        score -= 3
+                    if boardlist["B"][2] == boardlist["B"][3] == boardlist["C"][2]:
+                        score -= 3
+                if boardlist["C"][2] != boardlist["D"][2] and boardlist["D"][2] not in ["s","e"]:
+                    if boardlist["D"][2] == boardlist["D"][1] == boardlist["C"][1]:
+                        score -= 3
+                    if boardlist["D"][2] == boardlist["D"][3] == boardlist["C"][3]:
+                        score -= 3
+                if boardlist["C"][2] != boardlist["C"][1] and boardlist["C"][1] not in ["s","e"]:
+                    if boardlist["C"][1] == boardlist["C"][3] == boardlist["C"][0]:
+                        score -= 3
+            elif position == 3:
+                if boardlist["C"][3] != boardlist["C"][2] and boardlist["C"][2] not in ["s","e"]:
+                    if boardlist["C"][2] == boardlist["C"][1] == boardlist["C"][0]:
+                        score -= 3
+                    if boardlist["C"][2] == boardlist["B"][2] == boardlist["B"][3]:
+                        score -= 3
+                    if boardlist["C"][2] == boardlist["D"][2] == boardlist["D"][3]:
+                        score -= 3
+                if boardlist["C"][3] != boardlist["B"][3] and boardlist["B"][3] not in ["s","e"]:
+                    if boardlist["B"][3] == boardlist["A"][3] == boardlist["D"][3]:
+                        score -= 3
+        elif letter == "D":
+            if position == 0:
+                if boardlist["D"][0] != boardlist["C"][0] and boardlist["C"][0] not in ["s","e"]:
+                    if boardlist["C"][0] == boardlist["B"][0] == boardlist["A"][0]:
+                        score -= 3
+                    if boardlist["C"][0] == boardlist["C"][1] == boardlist["D"][1]:
+                        score -= 3
+                if boardlist["D"][0] != boardlist["D"][1] and boardlist["D"][1] not in ["s","e"]:
+                    if boardlist["D"][1] == boardlist["D"][2] == boardlist["D"][3]:
+                        score -= 3
+            elif position == 1:
+                score -= 1
+                if boardlist["D"][1] != boardlist["C"][1] and boardlist["C"][1] not in ["s","e"]:
+                    if boardlist["C"][1] == boardlist["B"][1] == boardlist["A"][1]:
+                        score -= 3
+                    if boardlist["C"][1] == boardlist["C"][0] == boardlist["D"][0]:
+                        score -= 3
+                    if boardlist["C"][1] == boardlist["C"][2] == boardlist["D"][2]:
+                        score -= 3
+                if boardlist["D"][1] != boardlist["D"][2] and boardlist["D"][2] not in ["s","e"]:
+                    if boardlist["D"][2] == boardlist["D"][3] == boardlist["D"][0]:
+                        score -= 3
+            elif position == 2:
+                score -= 1
+                if boardlist["D"][2] != boardlist["C"][2] and boardlist["C"][2] not in ["s","e"]:
+                    if boardlist["C"][2] == boardlist["B"][2] == boardlist["A"][2]:
+                        score -= 3
+                    if boardlist["C"][2] == boardlist["C"][1] == boardlist["D"][1]:
+                        score -= 3
+                    if boardlist["C"][2] == boardlist["C"][3] == boardlist["D"][3]:
+                        score -= 3
+                if boardlist["D"][2] != boardlist["D"][3] and boardlist["D"][3] not in ["s","e"]:
+                    if boardlist["D"][3] == boardlist["D"][1] == boardlist["D"][0]:
+                        score -= 3
+            elif position == 3:
+                if boardlist["D"][3] != boardlist["D"][2] and boardlist["D"][2] not in ["s","e"]:
+                    if boardlist["D"][2] == boardlist["D"][1] == boardlist["D"][0]:
+                        score -= 3
+                    if boardlist["D"][2] == boardlist["C"][2] == boardlist["C"][3]:
+                        score -= 3
+                if boardlist["D"][3] != boardlist["C"][3] and boardlist["C"][3] not in ["s","e"]:
+                    if boardlist["C"][3] == boardlist["B"][3] == boardlist["A"][3]:
+                        score -= 3
+        # Level 1
+        elif letter == "E":
             if position == 0:
                 if boardlist["E"][0] != boardlist["E"][1] and boardlist["E"][1] not in ["s","e"]:
                     if boardlist["E"][1] == boardlist["E"][2]:
@@ -1565,7 +2736,7 @@ class Machine(Player):
 
     def move(self, boardlist, mypiecenumber, theirpiecenumber, mypiece, theirpiece, flag):
         myboardlist = copy.deepcopy(boardlist)
-        check = self.minimax(myboardlist, 0, mypiece, theirpiece, 4, 0, flag)[1]
+        check = self.minimax(myboardlist, 0, mypiece, theirpiece, 2, 0, flag)[1]
         print("Machine player chooses:", end=" ")
         print(check)
         return check
