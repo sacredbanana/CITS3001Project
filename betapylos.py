@@ -673,6 +673,7 @@ class Board(object):
                     print(last_move)
                 board_list["Z"][0] = "e"
                 while x == 1:
+                    self.board_visual()
                     # Tell player it's their turn
                     print(player.name + "'s move please remove another piece. Or enter _ to skip")
                     if player is self.white:
@@ -1787,7 +1788,7 @@ class Machine(Player):
         #check = self.minimax(myboardlist, 0, mypiece, mynumber, theirpiece, theirnumber, 2, flag)
         check = self.alphabeta(-math.inf, math.inf, myboardlist, 0, mypiece, mynumber, theirpiece, theirnumber, 3, flag)
         print("Machine player chooses:", end=" ")
-        print(check)
+        print(check[1])
         return check[1]
 
 
@@ -1798,17 +1799,20 @@ class Machine(Player):
 def main():
 
     print("Welcome to Pylos")
+    print("To place a stone please enter its position separated by a comma for example A,0")
+    print("To raise a stone please enter its destination then the position of the piece for example E,0,A,3")
+    print("For optional removes, if you do not wish to remove any pieces enter _ to not remove any pieces")
+    print("Enjoy the game.")
     player1 = input("Is player 1 (white) human or machine? (h or m) ")
-    if(player1=="h"): player1 = Player("Human White")
-    elif(player1=="m"): player1 = Machine("Machine White")
+    if (player1=="h"): player1 = Player("Human (White)")
+    elif (player1=="m"): player1 = Machine("Machine (White)")
     else:
         return
     player2 = input("Is player 2 (black) human or machine? (h or m) ")
-    if(player2=="h"): player2 = Player("Human Black")
-    elif(player2=="m"): player2 = Machine("Machine Black")
+    if(player2=="h"): player2 = Player("Human (Black)")
+    elif(player2=="m"): player2 = Machine("Machine (Black)")
     else:
         return
-    print("'e' represents an empty block and 's' represents a sealed block")
     myBoard = Board(player1, player2)
     myBoard.play()
 
