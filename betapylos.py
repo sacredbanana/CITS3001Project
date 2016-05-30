@@ -1,3 +1,8 @@
+#------------------------------------------------------------------#
+# CITS3001 AI PROJECT 2016                                         #
+# GAME: PYLOS                                                      #
+# AUTHOR: SIMING ZHANG (21147006) and CAMERON ARMSTRONG (21194619) #
+#------------------------------------------------------------------#
 import copy
 import math
 
@@ -1804,15 +1809,20 @@ def main():
     print("For optional removes, if you do not wish to remove any pieces enter _ to not remove any pieces")
     print("Enjoy the game.")
     player1 = input("Is player 1 (white) human or machine? (h or m) ")
-    if (player1=="h"): player1 = Player("Human (White)")
-    elif (player1=="m"): player1 = Machine("Machine (White)")
+    if player1 == "h":
+        player1 = Player("Human (White)")
+    elif player1 == "m":
+        player1 = Machine("Machine (White)")
     else:
         return
     player2 = input("Is player 2 (black) human or machine? (h or m) ")
-    if(player2=="h"): player2 = Player("Human (Black)")
-    elif(player2=="m"): player2 = Machine("Machine (Black)")
+    if player2 == "h":
+        player2 = Player("Human (Black)")
+    elif player2 == "m":
+        player2 = Machine("Machine (Black)")
     else:
         return
+
     myBoard = Board(player1, player2)
     myBoard.play()
 
