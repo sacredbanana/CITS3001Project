@@ -5,6 +5,7 @@
 #------------------------------------------------------------------#
 import copy
 import math
+import time
 
 #######################################
 ############ Class: Board  ############
@@ -799,9 +800,9 @@ class Player(object):
         return input_list
 
 #######################################
-############ Class: Machine ###########
+############ Class: AI ###########
 #######################################
-class Machine(Player):
+class Artificial(Player):
 
     # Minimax for finding the best next move
     # @Returns the score and move
@@ -1791,9 +1792,14 @@ class Machine(Player):
     def move(self, boardlist, mynumber, theirnumber, mypiece, theirpiece, flag):
         myboardlist = copy.deepcopy(boardlist)
         #check = self.minimax(myboardlist, 0, mypiece, mynumber, theirpiece, theirnumber, 2, flag)
+        t0 = time.time()
         check = self.alphabeta(-math.inf, math.inf, myboardlist, 0, mypiece, mynumber, theirpiece, theirnumber, 3, flag)
-        print("Machine player chooses:", end=" ")
+        t1 = time.time()
+        print("AI player chooses:", end=" ")
         print(check[1])
+        print("AI, used: ", end="")
+        print(t1 - t0, end="")
+        print(" seconds")
         return check[1]
 
 
@@ -1808,18 +1814,18 @@ def main():
     print("To raise a stone please enter its destination then the position of the piece for example E,0,A,3")
     print("For optional removes, if you do not wish to remove any pieces enter _ to not remove any pieces")
     print("Enjoy the game.")
-    player1 = input("Is player 1 (white) human or machine? (h or m) ")
-    if player1 == "h":
+    player1 = input("Is player 1 (white) human or AI? (H or A) ")
+    if player1 == "H":
         player1 = Player("Human (White)")
-    elif player1 == "m":
-        player1 = Machine("Machine (White)")
+    elif player1 == "A":
+        player1 = Artificial("AI (White)")
     else:
         return
-    player2 = input("Is player 2 (black) human or machine? (h or m) ")
-    if player2 == "h":
+    player2 = input("Is player 2 (black) human or AI? (H or A) ")
+    if player2 == "H":
         player2 = Player("Human (Black)")
-    elif player2 == "m":
-        player2 = Machine("Machine (Black)")
+    elif player2 == "A":
+        player2 = Artificial("AI (Black)")
     else:
         return
 
