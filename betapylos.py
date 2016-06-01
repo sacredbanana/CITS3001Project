@@ -5,6 +5,7 @@
 #------------------------------------------------------------------#
 import copy
 import math
+import time
 
 #######################################
 ############ Class: Board  ############
@@ -782,6 +783,7 @@ class Board(object):
                     break
 
     def win(self,player):
+        self.board_visual()
         print(player.name + " won!")
 
 
@@ -799,9 +801,9 @@ class Player(object):
         return input_list
 
 #######################################
-############ Class: Machine ###########
+############ Class: AI ################
 #######################################
-class Machine(Player):
+class Artificial(Player):
 
     # Minimax for finding the best next move
     # @Returns the score and move
@@ -812,7 +814,7 @@ class Machine(Player):
             if depth == 0:  # last move been searched
                 if side == 0:  # my turn
                     movelist = self.moveList(boardlist, mypiece)
-                    best = [-math.inf, ["F",0]]
+                    best = [-math.inf, ["F", 0]]
                     for i in movelist:
                         if len(i) == 2:  # if its just a simple place and not a raise
                             self.mplace(i[0], i[1], mypiece, boardlist)  # place the piece
@@ -1280,7 +1282,7 @@ class Machine(Player):
         for i, x in enumerate(boardlist["C"]):
             if x == "e":
                 count.append(["C", i])
-        for i, x in enumerate(boardlist["C"]):
+        for i, x in enumerate(boardlist["D"]):
             if x == "e":
                 count.append(["D", i])
         for i, x in enumerate(boardlist["E"]):
@@ -1790,13 +1792,1019 @@ class Machine(Player):
 
     def move(self, boardlist, mynumber, theirnumber, mypiece, theirpiece, flag):
         myboardlist = copy.deepcopy(boardlist)
+        t0 = time.time()
         #check = self.minimax(myboardlist, 0, mypiece, mynumber, theirpiece, theirnumber, 2, flag)
         check = self.alphabeta(-math.inf, math.inf, myboardlist, 0, mypiece, mynumber, theirpiece, theirnumber, 3, flag)
-        print("Machine player chooses:", end=" ")
+        t1 = time.time()
+        print("AI player chooses:", end=" ")
         print(check[1])
+        print("AI used: ", end="")
+        print(t1 - t0, end="")
+        print(" seconds")
         return check[1]
 
+#######################################
+############ Class: AI-2 ##############
+#######################################
+class Artificial2(Player):
 
+    # Minimax for finding the best next move
+    # @Returns the score and move
+    def minimax(self, boardlist, side, mypiece, mynumber, theirpiece, theirnumber, depth, flag):
+        best = [None, None]
+        #---------------------------------------------------PLACING OR RASING A STONE---------------------------------------------------#
+        if flag == 0:  # normal moves or raise
+            if depth == 0:  # last move been searched
+                if side == 0:  # my turn
+                    movelist = self.moveList(boardlist, mypiece)
+                    best = [-math.inf, ["F",0]]
+                    for i in movelist:
+                        if len(i) == 2:  # if its just a simple place and not a raise
+                            self.mplace(i[0], i[1], mypiece, boardlist)  # place the piece
+                            myscore = self.evaluate(boardlist, i[0], i[1], mypiece, mynumber-1, theirpiece, theirnumber)  # evaluate the score of the current board state
+                            self.mundoplace(i[0], i[1], boardlist)
+                        else:  # len(i) == 4 if its a raise
+                            self.mplace(i[0], i[1], mypiece, boardlist)  # place the piece first
+                            self.mundoplace(i[2], i[3], boardlist)  # then remove the piece
+                            myscore = self.evaluate(boardlist, i[0], i[1], mypiece, mynumber-1, theirpiece, theirnumber)  # evaluate the score of the current board state
+                            self.mundoplace(i[0], i[1], boardlist)
+                            self.mplace(i[2], i[3], mypiece, boardlist)
+                        if myscore >= best[0]:  # see if myscore exceeds best score so far
+                            best[0] = myscore
+                            best[1] = i
+                    return best  # return the best score and move
+                else:  # if side == 1, ie their turn
+                    movelist = self.moveList(boardlist, theirpiece)
+                    best = [math.inf, ["F", 0]]
+                    for i in movelist:
+                        if len(i) == 2:  # if its just a simple place and not a raise
+                            self.mplace(i[0], i[1], theirpiece, boardlist)
+                            myscore = self.evaluate(boardlist, i[0], i[1], mypiece, mynumber, theirpiece, theirnumber-1)  # evaluate the score of the current board state
+                            self.mundoplace(i[0], i[1], boardlist)
+                        else:  # len(i) == 4 if its a raise
+                            self.mplace(i[0], i[1], theirpiece, boardlist)  # place their piece
+                            self.mundoplace(i[2], i[3], boardlist)  # remove that piece thus making a raise
+                            myscore = self.evaluate(boardlist, i[0], i[1], mypiece, mynumber, theirpiece, theirnumber-1)  # evaluate the score of the current board state
+                            self.mundoplace(i[0], i[1], boardlist)
+                            self.mplace(i[2], i[3], theirpiece, boardlist)
+                        if myscore <= best[0]:  # see if myscore is smaller than the best score so far
+                            best[0] = myscore
+                            best[1] = i
+                    return best
+
+            else:  # if depth != 0, ie not last move
+                if side == 0:  # my turn
+                    movelist = self.moveList(boardlist, mypiece)
+                    best = [-math.inf, ["F",0]]
+                    for i in movelist:
+                        if len(i) == 2:  # if its just a simple place and not a raise
+                            self.mplace(i[0], i[1], mypiece, boardlist)  # place the piece
+                            if self.mrcheck(i[0], i[1], boardlist):
+                                myscore = self.minimax(boardlist, 0, mypiece, mynumber-1, theirpiece, theirnumber, depth-1, 1)[0]
+                            else:
+                                myscore = self.minimax(boardlist, 1, mypiece, mynumber-1, theirpiece, theirnumber, depth-1, 0)[0]
+                            self.mundoplace(i[0], i[1], boardlist)
+                        else:  # len(i) == 4 if its a raise
+                            self.mplace(i[0], i[1], mypiece, boardlist)  # place the piece first
+                            self.mundoplace(i[2], i[3], boardlist)  # then remove the piece
+                            if self.mrcheck(i[0], i[1], boardlist):
+                                myscore = self.minimax(boardlist, 0, mypiece, mynumber, theirpiece, theirnumber, depth-1, 1)[0]
+                            else:
+                                myscore = self.minimax(boardlist, 1, mypiece, mynumber, theirpiece, theirnumber, depth-1, 0)[0]
+                            self.mundoplace(i[0], i[1], boardlist)
+                            self.mplace(i[2], i[3], mypiece, boardlist)
+                        if myscore >= best[0]:  # see if myscore exceeds best score so far
+                            best[0] = myscore
+                            best[1] = i
+                    return best  # return the best score and move
+                else:  # if side == 1, ie their turn
+                    movelist = self.moveList(boardlist, theirpiece)
+                    best = [math.inf, ["F", 0]]
+                    for i in movelist:
+                        if len(i) == 2:  # if its just a simple place and not a raise
+                            self.mplace(i[0], i[1], theirpiece, boardlist)
+                            if self.mrcheck(i[0], i[1], boardlist):
+                                myscore = self.minimax(boardlist, 1, mypiece, mynumber, theirpiece, theirnumber-1, depth-1, 1)[0]
+                            else:
+                                myscore = self.minimax(boardlist, 0, mypiece, mynumber, theirpiece, theirnumber-1, depth-1, 0)[0]
+                            self.mundoplace(i[0], i[1], boardlist)
+                        else:  # len(i) == 4 if its a raise
+                            self.mplace(i[0], i[1], theirpiece, boardlist)  # place their piece
+                            self.mundoplace(i[2], i[3], boardlist)  # remove that piece thus making a raise
+                            if self.mrcheck(i[0], i[1], boardlist):
+                                myscore = self.minimax(boardlist, 1, mypiece, mynumber, theirpiece, theirnumber, depth-1, 1)[0]
+                            else:
+                                myscore = self.minimax(boardlist, 0, mypiece, mynumber, theirpiece, theirnumber, depth-1, 0)[0]
+                            self.mundoplace(i[0], i[1], boardlist)
+                            self.mplace(i[2], i[3], theirpiece, boardlist)
+                        if myscore <= best[0]:  # see if myscore is smaller than the best score so far
+                            best[0] = myscore
+                            best[1] = i
+                    return best
+        #---------------------------------------------------COMPULSORY REMOVES---------------------------------------------------#
+        elif flag == 1:  # for must removes
+            if depth == 0:  # last move been searched
+                if side == 0:  # if its my turn
+                    movelist = self.removeList(boardlist, mypiece, 3)  # get a list of all the positions i can remove from
+                    best = [-math.inf, ["E", 0]]
+                    for i in movelist:
+                        self.mundoplace(i[0], i[1], boardlist)
+                        myscore = self.evaluate(boardlist, i[0], i[1], mypiece, mynumber+1, theirpiece, theirnumber)
+                        self.mplace(i[0], i[1], mypiece, boardlist)
+                        if myscore >= best[0]:
+                            best[0] = myscore
+                            best[1] = i
+                    return best
+                else:  # if side == 1, ie their turn
+                    movelist = self.removeList(boardlist, theirpiece, 3)
+                    best = [math.inf, ["E", 0]]
+                    for i in movelist:
+                        self.mundoplace(i[0], i[1], boardlist)
+                        myscore = self.evaluate(boardlist, i[0], i[1], mypiece, mynumber, theirpiece, theirnumber+1)
+                        self.mplace(i[0], i[1], theirpiece, boardlist)
+                        if myscore <= best[0]:
+                            best[0] = myscore
+                            best[1] = i
+                    return best
+
+            else:  # if depth != 0, ie not the last move been searched
+                if side == 0:  # if its my turn
+                    movelist = self.removeList(boardlist, mypiece, 3)  # get a list of all the positions i can remove from
+                    best = [-math.inf, ["E", 0]]
+                    for i in movelist:
+                        self.mundoplace(i[0], i[1], boardlist)
+                        myscore = self.minimax(boardlist, 0, mypiece, mynumber+1, theirpiece, theirnumber, depth-1, 2)[0]
+                        self.mplace(i[0], i[1], mypiece, boardlist)
+                        if myscore >= best[0]:
+                            best[0] = myscore
+                            best[1] = i
+                    return best
+                else:  # if side == 1, ie their turn
+                    movelist = self.removeList(boardlist, theirpiece, 3)
+                    best = [math.inf, ["E", 0]]
+                    for i in movelist:
+                        self.mundoplace(i[0], i[1], boardlist)
+                        myscore = self.minimax(boardlist, 1, mypiece, mynumber, theirpiece, theirnumber+1, depth-1, 2)[0]
+                        self.mplace(i[0], i[1], theirpiece, boardlist)
+                        if myscore <= best[0]:
+                            best[0] = myscore
+                            best[1] = i
+                    return best
+        #---------------------------------------------------OPTIONAL REMOVES---------------------------------------------------#
+        else:  # flag == 2, for optional removes
+            if depth == 0:  # last move been searched
+                if side == 0:  # if its my turn
+                    movelist = self.removeList(boardlist, mypiece, 3)  # get a list of all the positions i can remove from
+                    movelist.append("_")
+                    best = [-math.inf, ["E", 0]]
+                    for i in movelist:
+                        if i == "_":
+                            myscore = self.evaluate(boardlist, "Z", 0, mypiece, mynumber, theirpiece, theirnumber)
+                        else:
+                            self.mundoplace(i[0], i[1], boardlist)
+                            myscore = self.evaluate(boardlist, i[0], i[1], mypiece, mynumber+1, theirpiece, theirnumber)
+                            self.mplace(i[0], i[1], mypiece, boardlist)
+                        if myscore >= best[0]:
+                            best[0] = myscore
+                            best[1] = i
+                    return best
+                else:  # if side == 1, ie their turn
+                    movelist = self.removeList(boardlist, theirpiece, 3)
+                    moevlist.append("_")
+                    best = [math.inf, ["E", 0]]
+                    for i in movelist:
+                        if i == "_":
+                            myscore = self.evaluate(boardlist, "Z", 0, mypiece, mynumber, theirpiece, theirnumber)
+                        else:
+                            self.mundoplace(i[0], i[1], boardlist)
+                            myscore = self.evaluate(boardlist, i[0], i[1], mypiece, mynumber, theirpiece, theirnumber+1)
+                            self.mplace(i[0], i[1], theirpiece, boardlist)
+                        if myscore <= best[0]:
+                            best[0] = myscore
+                            best[1] = i
+                    return best
+
+            else:  # if depth != 0, ie not the last move been searched
+                if side == 0:  # if its my turn
+                    movelist = self.removeList(boardlist, mypiece, 3)  # get a list of all the positions i can remove from
+                    movelist.append("_")
+                    best = [-math.inf, ["E", 0]]
+                    for i in movelist:
+                        if i == "_":
+                            myscore = self.minimax(boardlist, 1, mypiece, mynumber, theirpiece, theirnumber, depth-1, 0)[0]
+                        else:
+                            self.mundoplace(i[0], i[1], boardlist)
+                            myscore = self.minimax(boardlist, 1, mypiece, mynumber+1, theirpiece, theirnumber, depth-1, 0)[0]
+                            self.mplace(i[0], i[1], mypiece, boardlist)
+                        if myscore >= best[0]:
+                            best[0] = myscore
+                            best[1] = i
+                    return best
+                else:  # if side == 1, ie their turn
+                    movelist = self.removeList(boardlist, theirpiece, 3)
+                    movelist.append("_")
+                    best = [math.inf, ["E", 0]]
+                    for i in movelist:
+                        if i == "_":
+                            myscore = self.minimax(boardlist, 0, mypiece, mynumber, theirpiece, theirnumber, depth-1, 0)[0]
+                        else:
+                            self.mundoplace(i[0], i[1], boardlist)
+                            myscore = self.minimax(boardlist, 0, mypiece, mynumber, theirpiece, theirnumber+1, depth-1, 0)[0]
+                            self.mplace(i[0], i[1], theirpiece, boardlist)
+                        if myscore <= best[0]:
+                            best[0] = myscore
+                            best[1] = i
+                    return best
+
+    # Improved version of minimax - alphabeta
+    # @Returns the score and move
+    def alphabeta(self, alphavalue, betavalue, boardlist, side, mypiece, mynumber, theirpiece, theirnumber, depth, flag):
+        best = [None, None]
+        alpha = alphavalue
+        beta = betavalue
+        #---------------------------------------------------PLACING OR RASING A STONE---------------------------------------------------#
+        if flag == 0:  # normal moves or raise
+            #----------------------------------DEPTH 0----------------------------------#
+            if depth == 0:  # last move been searched
+                if side == 0:  # my turn
+                    movelist = self.moveList(boardlist, mypiece)
+                    best = [-math.inf, ["F", 0]]
+                    for i in movelist:
+                        if best[0] >= beta:
+                            break
+                        elif best[0] < beta:
+                            if len(i) == 2:  # if its just a simple place and not a raise
+                                self.mplace(i[0], i[1], mypiece, boardlist)  # place the piece
+                                myscore = self.evaluate(boardlist, i[0], i[1], mypiece, mynumber-1, theirpiece, theirnumber)  # evaluate the score of the current board state
+                                self.mundoplace(i[0], i[1], boardlist)
+                            else:  # len(i) == 4 if its a raise
+                                self.mplace(i[0], i[1], mypiece, boardlist)  # place the piece first
+                                self.mundoplace(i[2], i[3], boardlist)  # then remove the piece
+                                myscore = self.evaluate(boardlist, i[0], i[1], mypiece, mynumber-1, theirpiece, theirnumber)  # evaluate the score of the current board state
+                                self.mundoplace(i[0], i[1], boardlist)
+                                self.mplace(i[2], i[3], mypiece, boardlist)
+                            if myscore >= best[0]:  # see if myscore exceeds best score so far
+                                best[0] = myscore
+                                best[1] = i
+                    return best  # return the best score and move
+                else:  # if side == 1, ie their turn
+                    movelist = self.moveList(boardlist, theirpiece)
+                    best = [math.inf, ["F", 0]]
+                    for i in movelist:
+                        if best[0] <= alpha:
+                            break
+                        elif best[0] > alpha:
+                            if len(i) == 2:  # if its just a simple place and not a raise
+                                self.mplace(i[0], i[1], theirpiece, boardlist)
+                                myscore = self.evaluate(boardlist, i[0], i[1], mypiece, mynumber, theirpiece, theirnumber-1)  # evaluate the score of the current board state
+                                self.mundoplace(i[0], i[1], boardlist)
+                            else:  # len(i) == 4 if its a raise
+                                self.mplace(i[0], i[1], theirpiece, boardlist)  # place their piece
+                                self.mundoplace(i[2], i[3], boardlist)  # remove that piece thus making a raise
+                                myscore = self.evaluate(boardlist, i[0], i[1], mypiece, mynumber, theirpiece, theirnumber-1)  # evaluate the score of the current board state
+                                self.mundoplace(i[0], i[1], boardlist)
+                                self.mplace(i[2], i[3], theirpiece, boardlist)
+                            if myscore <= best[0]:  # see if myscore is smaller than the best score so far
+                                best[0] = myscore
+                                best[1] = i
+                    return best
+            #----------------------------------NOT DEPTH 0----------------------------------#
+            else:  # if depth != 0, ie not last move
+                if side == 0:  # my turn
+                    movelist = self.moveList(boardlist, mypiece)
+                    best = [-math.inf, ["F", 0]]
+                    for i in movelist:
+                        if best[0] >= beta:
+                            break
+                        elif best[0] < beta:
+                            if len(i) == 2:  # if its just a simple place and not a raise
+                                self.mplace(i[0], i[1], mypiece, boardlist)  # place the piece
+                                if self.mrcheck(i[0], i[1], boardlist):
+                                    myscore = self.alphabeta(alpha, beta, boardlist, 0, mypiece, mynumber-1, theirpiece, theirnumber, depth-1, 1)[0]
+                                else:
+                                    myscore = self.alphabeta(alpha, beta, boardlist, 1, mypiece, mynumber-1, theirpiece, theirnumber, depth-1, 0)[0]
+                                self.mundoplace(i[0], i[1], boardlist)
+                            else:  # len(i) == 4 if its a raise
+                                self.mplace(i[0], i[1], mypiece, boardlist)  # place the piece first
+                                self.mundoplace(i[2], i[3], boardlist)  # then remove the piece
+                                if self.mrcheck(i[0], i[1], boardlist):
+                                    myscore = self.alphabeta(alpha, beta, boardlist, 0, mypiece, mynumber, theirpiece, theirnumber, depth-1, 1)[0]
+                                else:
+                                    myscore = self.alphabeta(alpha, beta, boardlist, 1, mypiece, mynumber, theirpiece, theirnumber, depth-1, 0)[0]
+                                self.mundoplace(i[0], i[1], boardlist)
+                                self.mplace(i[2], i[3], mypiece, boardlist)
+                            if myscore >= best[0]:  # see if myscore exceeds best score so far
+                                best[0] = myscore
+                                best[1] = i
+                                alpha = myscore
+                    return best  # return the best score and move
+                else:  # if side == 1, ie their turn
+                    movelist = self.moveList(boardlist, theirpiece)
+                    best = [math.inf, ["F", 0]]
+                    for i in movelist:
+                        if best[0] <= alpha:
+                            break
+                        elif best[0] > alpha:
+                            if len(i) == 2:  # if its just a simple place and not a raise
+                                self.mplace(i[0], i[1], theirpiece, boardlist)
+                                if self.mrcheck(i[0], i[1], boardlist):
+                                    myscore = self.alphabeta(alpha, beta, boardlist, 1, mypiece, mynumber, theirpiece, theirnumber-1, depth-1, 1)[0]
+                                else:
+                                    myscore = self.alphabeta(alpha, beta, boardlist, 0, mypiece, mynumber, theirpiece, theirnumber-1, depth-1, 0)[0]
+                                self.mundoplace(i[0], i[1], boardlist)
+                            else:  # len(i) == 4 if its a raise
+                                self.mplace(i[0], i[1], theirpiece, boardlist)  # place their piece
+                                self.mundoplace(i[2], i[3], boardlist)  # remove that piece thus making a raise
+                                if self.mrcheck(i[0], i[1], boardlist):
+                                    myscore = self.alphabeta(alpha, beta, boardlist, 1, mypiece, mynumber, theirpiece, theirnumber, depth-1, 1)[0]
+                                else:
+                                    myscore = self.alphabeta(alpha, beta, boardlist, 0, mypiece, mynumber, theirpiece, theirnumber, depth-1, 0)[0]
+                                self.mundoplace(i[0], i[1], boardlist)
+                                self.mplace(i[2], i[3], theirpiece, boardlist)
+                            if myscore <= best[0]:  # see if myscore is smaller than the best score so far
+                                best[0] = myscore
+                                best[1] = i
+                                beta = myscore
+                    return best
+        #---------------------------------------------------COMPULSORY REMOVES---------------------------------------------------#
+        elif flag == 1:  # for must removes
+            if depth == 0:  # last move been searched
+                if side == 0:  # if its my turn
+                    movelist = self.removeList(boardlist, mypiece, 3)  # get a list of all the positions i can remove from
+                    best = [-math.inf, ["E", 0]]
+                    for i in movelist:
+                        if best[0] >= beta:
+                            break
+                        elif best[0] < beta:
+                            self.mundoplace(i[0], i[1], boardlist)
+                            myscore = self.evaluate(boardlist, i[0], i[1], mypiece, mynumber+1, theirpiece, theirnumber)
+                            self.mplace(i[0], i[1], mypiece, boardlist)
+                            if myscore >= best[0]:
+                                best[0] = myscore
+                                best[1] = i
+                                alpha = myscore
+                    return best
+                else:  # if side == 1, ie their turn
+                    movelist = self.removeList(boardlist, theirpiece, 3)
+                    best = [math.inf, ["E", 0]]
+                    for i in movelist:
+                        if best[0] <= alpha:
+                            break
+                        elif best[0] > alpha:
+                            self.mundoplace(i[0], i[1], boardlist)
+                            myscore = self.evaluate(boardlist, i[0], i[1], mypiece, mynumber, theirpiece, theirnumber+1)
+                            self.mplace(i[0], i[1], theirpiece, boardlist)
+                            if myscore <= best[0]:
+                                best[0] = myscore
+                                best[1] = i
+                                beta = myscore
+                    return best
+
+            else:  # if depth != 0, ie not the last move been searched
+                if side == 0:  # if its my turn
+                    movelist = self.removeList(boardlist, mypiece, 3)  # get a list of all the positions i can remove from
+                    best = [-math.inf, ["E", 0]]
+                    for i in movelist:
+                        if best[0] >= beta:
+                            break
+                        elif best[0] < beta:
+                            self.mundoplace(i[0], i[1], boardlist)
+                            myscore = self.alphabeta(alpha, beta, boardlist, 0, mypiece, mynumber+1, theirpiece, theirnumber, depth-1, 2)[0]
+                            self.mplace(i[0], i[1], mypiece, boardlist)
+                            if myscore >= best[0]:
+                                best[0] = myscore
+                                best[1] = i
+                                alpha = myscore
+                    return best
+                else:  # if side == 1, ie their turn
+                    movelist = self.removeList(boardlist, theirpiece, 3)
+                    best = [math.inf, ["E", 0]]
+                    for i in movelist:
+                        if best[0] <= alpha:
+                            break
+                        elif best[0] > alpha:
+                            self.mundoplace(i[0], i[1], boardlist)
+                            myscore = self.alphabeta(alpha, beta, boardlist, 1, mypiece, mynumber, theirpiece, theirnumber+1, depth-1, 2)[0]
+                            self.mplace(i[0], i[1], theirpiece, boardlist)
+                            if myscore <= best[0]:
+                                best[0] = myscore
+                                best[1] = i
+                                beta = myscore
+                    return best
+        #---------------------------------------------------OPTIONAL REMOVES---------------------------------------------------#
+        else:  # flag == 2, for optional removes
+            if depth == 0:  # last move been searched
+                if side == 0:  # if its my turn
+                    movelist = self.removeList(boardlist, mypiece, 3)  # get a list of all the positions i can remove from
+                    movelist.append("_")
+                    best = [-math.inf, ["E", 0]]
+                    for i in movelist:
+                        if best[0] >= beta:
+                            break
+                        elif best[0] < beta:
+                            if i == "_":
+                                myscore = self.evaluate(boardlist, "Z", 0, mypiece, mynumber, theirpiece, theirnumber)
+                            else:
+                                self.mundoplace(i[0], i[1], boardlist)
+                                myscore = self.evaluate(boardlist, i[0], i[1], mypiece, mynumber+1, theirpiece, theirnumber)
+                                self.mplace(i[0], i[1], mypiece, boardlist)
+                            if myscore >= best[0]:
+                                best[0] = myscore
+                                best[1] = i
+                    return best
+                else:  # if side == 1, ie their turn
+                    movelist = self.removeList(boardlist, theirpiece, 3)
+                    movelist.append("_")
+                    best = [math.inf, ["E", 0]]
+                    for i in movelist:
+                        if best[0] <= alpha:
+                            break
+                        elif best[0] > alpha:
+                            if i == "_":
+                                myscore = self.evaluate(boardlist, "Z", 0, mypiece, mynumber, theirpiece, theirnumber)
+                            else:
+                                self.mundoplace(i[0], i[1], boardlist)
+                                myscore = self.evaluate(boardlist, i[0], i[1], mypiece, mynumber, theirpiece, theirnumber+1)
+                                self.mplace(i[0], i[1], theirpiece, boardlist)
+                            if myscore <= best[0]:
+                                best[0] = myscore
+                                best[1] = i
+                    return best
+
+            else:  # if depth != 0, ie not the last move been searched
+                if side == 0:  # if its my turn
+                    movelist = self.removeList(boardlist, mypiece, 3)  # get a list of all the positions i can remove from
+                    movelist.append("_")
+                    best = [-math.inf, ["E", 0]]
+                    for i in movelist:
+                        if best[0] >= beta:
+                            break
+                        elif best[0] < beta:
+                            if i == "_":
+                                myscore = self.alphabeta(alpha, beta, boardlist, 1, mypiece, mynumber, theirpiece, theirnumber, depth-1, 0)[0]
+                            else:
+                                self.mundoplace(i[0], i[1], boardlist)
+                                myscore = self.alphabeta(alpha, beta, boardlist, 1, mypiece, mynumber+1, theirpiece, theirnumber, depth-1, 0)[0]
+                                self.mplace(i[0], i[1], mypiece, boardlist)
+                            if myscore >= best[0]:
+                                best[0] = myscore
+                                best[1] = i
+                                alpha = myscore
+                    return best
+                else:  # if side == 1, ie their turn
+                    movelist = self.removeList(boardlist, theirpiece, 3)
+                    movelist.append("_")
+                    best = [math.inf, ["E", 0]]
+                    for i in movelist:
+                        if best[0] <= alpha:
+                            break
+                        elif best[0] > alpha:
+                            if i == "_":
+                                myscore = self.alphabeta(alpha, beta, boardlist, 0, mypiece, mynumber, theirpiece, theirnumber, depth-1, 0)[0]
+                            else:
+                                self.mundoplace(i[0], i[1], boardlist)
+                                myscore = self.alphabeta(alpha, beta, boardlist, 0, mypiece, mynumber, theirpiece, theirnumber+1, depth-1, 0)[0]
+                                self.mplace(i[0], i[1], theirpiece, boardlist)
+                            if myscore <= best[0]:
+                                best[0] = myscore
+                                best[1] = i
+                                beta = myscore
+                    return best
+
+    # Generates possible move list based on game state
+    # stores the moves in a list, count
+    # @Returns count
+    def moveList(self, boardlist, piece):
+        count = []
+        for i, x in enumerate(boardlist["A"]):
+            if x == "e":
+                count.append(["A", i])
+        for i, x in enumerate(boardlist["B"]):
+            if x == "e":
+                count.append(["B", i])
+        for i, x in enumerate(boardlist["C"]):
+            if x == "e":
+                count.append(["C", i])
+        for i, x in enumerate(boardlist["D"]):
+            if x == "e":
+                count.append(["D", i])
+        for i, x in enumerate(boardlist["E"]):
+            if x == "e":
+                count.append(["E", i])
+                self.mplace("E", i, piece, boardlist)
+                removelist = self.removeList(boardlist, piece, 1)
+                if len(removelist) > 0:
+                    for r in removelist:
+                        count.append(["E", i, r[0], r[1]])
+                self.mundoplace("E", i, boardlist)
+        for i, x in enumerate(boardlist["F"]):
+            if x == "e":
+                count.append(["F", i])
+                self.mplace("F", i, piece, boardlist)
+                removelist = self.removeList(boardlist, piece, 1)
+                if len(removelist) > 0:
+                    for r in removelist:
+                        count.append(["F", i, r[0], r[1]])
+                self.mundoplace("F", i, boardlist)
+        for i, x in enumerate(boardlist["G"]):
+            if x == "e":
+                count.append(["G", i])
+                self.mplace("G", i, piece, boardlist)
+                removelist = self.removeList(boardlist, piece, 1)
+                if len(removelist) > 0:
+                    for r in removelist:
+                        count.append(["G", i, r[0], r[1]])
+                self.mundoplace("G", i, boardlist)
+        for i, x in enumerate(boardlist["H"]):
+            if x == "e":
+                count.append(["H", i])
+                self.mplace("H", i, piece, boardlist)
+                removelist = self.removeList(boardlist, piece, 2)
+                if len(removelist) > 0:
+                    for r in removelist:
+                        count.append(["H", i, r[0], r[1]])
+                self.mundoplace("H", i, boardlist)
+        for i, x in enumerate(boardlist["I"]):
+            if x == "e":
+                count.append(["I", i])
+                self.mplace("I", i, piece, boardlist)
+                removelist = self.removeList(boardlist, piece, 2)
+                if len(removelist) > 0:
+                    for r in removelist:
+                        count.append(["I", i, r[0], r[1]])
+                self.mundoplace("I", i, boardlist)
+        for i, x in enumerate(boardlist["J"]):
+            if x == "e":
+                count.append(["J", i])
+        return count
+
+    # Generates  possible remove list based on game state
+    # stores the moves in a list, count
+    # @Returns count
+    def removeList(self, boardlist, piece, level):
+        count = []
+        if level >= 1:
+            for i, x in enumerate(boardlist["A"]):
+                if x == piece and self.mcanremove("A", i, boardlist):
+                    count.append(["A", i])
+            for i, x in enumerate(boardlist["B"]):
+                if x == piece and self.mcanremove("B", i, boardlist):
+                    count.append(["B", i])
+            for i, x in enumerate(boardlist["C"]):
+                if x == piece and self.mcanremove("C", i, boardlist):
+                    count.append(["C", i])
+            for i, x in enumerate(boardlist["D"]):
+                if x == piece and self.mcanremove("D", i, boardlist):
+                    count.append(["D", i])
+        if level >= 2:
+            for i, x in enumerate(boardlist["E"]):
+                if x == piece and self.mcanremove("E", i, boardlist):
+                    count.append(["E", i])
+            for i, x in enumerate(boardlist["F"]):
+                if x == piece and self.mcanremove("F", i, boardlist):
+                    count.append(["F", i])
+            for i, x in enumerate(boardlist["G"]):
+                if x == piece and self.mcanremove("G", i, boardlist):
+                    count.append(["G", i])
+        if level >= 3:
+            for i, x in enumerate(boardlist["H"]):
+                if x == piece:
+                    count.append(["H", i])
+            for i, x in enumerate(boardlist["I"]):
+                if x == piece:
+                    count.append(["I", i])
+        return count
+
+    # Places piece on position
+    # @returns True if successful
+    # @returns False if otherwise
+    def mplace(self, letter, position, piece, boardlist):
+        try:
+            if boardlist[letter][position] == "e":
+                boardlist[letter][position] = piece
+                self.mboard_update(boardlist)
+                return True
+            else:
+                return False
+        except:
+            return False
+
+    # Removes a piece from its position (Undos a place)
+    # @returns True if successful
+    # @returns Flase if otherwise
+    def mundoplace(self, letter, position, boardlist):
+            if boardlist[letter][position] in ("w", "b"):
+                boardlist[letter][position] = "e"
+                self.mboard_update(boardlist)
+                return True
+            else:
+                return False
+
+    # Updates the board by unlocking positions if bottom positions are filled
+    def mboard_update(self, boardlist):
+        # Unseals J[0]
+        if boardlist["J"][0] == "s":
+            boardlist["J"][0] = "e"
+        for v, w in boardlist["H"], boardlist["I"]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["J"][0] = "s"
+        # Unseals H[0]
+        if boardlist["H"][0] == "s":
+            boardlist["H"][0] = "e"
+        for v, w in boardlist["E"][:2], boardlist["F"][:2]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["H"][0] = "s"
+        # Unseals H[1]
+        if boardlist["H"][1] == "s":
+            boardlist["H"][1] = "e"
+        for v, w in boardlist["E"][1:3], boardlist["F"][1:3]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["H"][1] = "s"
+        # Unseals I[0]
+        if boardlist["I"][0] == "s":
+            boardlist["I"][0] = "e"
+        for v, w in boardlist["F"][:2], boardlist["G"][:2]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["I"][0] = "s"
+        # Unseals I[1]
+        if boardlist["I"][1] == "s":
+            boardlist["I"][1] = "e"
+        for v, w in boardlist["F"][1:3], boardlist["G"][1:3]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["I"][1] = "s"
+        # Unseals E[0]
+        if boardlist["E"][0] == "s":
+            boardlist["E"][0] = "e"
+        for v, w in boardlist["A"][:2], boardlist["B"][:2]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["E"][0] = "s"
+        # Unseals E[1]
+        if boardlist["E"][1] == "s":
+            boardlist["E"][1] = "e"
+        for v, w in boardlist["A"][1:3], boardlist["B"][1:3]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["E"][1] = "s"
+        # Unseals E[2]
+        if boardlist["E"][2] == "s":
+            boardlist["E"][2] = "e"
+        for v, w in boardlist["A"][2:4], boardlist["B"][2:4]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["E"][2] = "s"
+        # Unseals F[0]
+        if boardlist["F"][0] == "s":
+            boardlist["F"][0] = "e"
+        for v, w in boardlist["B"][:2], boardlist["C"][:2]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["F"][0] = "s"
+        # Unseals F[1]
+        if boardlist["F"][1] == "s":
+            boardlist["F"][1] = "e"
+        for v, w in boardlist["B"][1:3], boardlist["C"][1:3]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["F"][1] = "s"
+        # Unseals F[2]
+        if boardlist["F"][2] == "s":
+            boardlist["F"][2] = "e"
+        for v, w in boardlist["B"][2:4], boardlist["C"][2:4]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["F"][2] = "s"
+        # Unseals G[0]
+        if boardlist["G"][0] == "s":
+            boardlist["G"][0] = "e"
+        for v, w in boardlist["C"][:2], boardlist["D"][:2]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["G"][0] = "s"
+        # Unseals G[1]
+        if boardlist["G"][1] == "s":
+            boardlist["G"][1] = "e"
+        for v, w in boardlist["C"][1:3], boardlist["D"][1:3]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["G"][1] = "s"
+        # Unseals G[2]
+        if boardlist["G"][2] == "s":
+            boardlist["G"][2] = "e"
+        for v, w in boardlist["C"][2:4], boardlist["D"][2:4]:
+            if v == "e" or w == "e" or v == "s" or w == "s":
+                boardlist["G"][2] = "s"
+
+    # Checks if a piece needs to be removed
+    # @Returns True if a piece needs to be removed
+    # @Returns False if otherwise
+    def mrcheck(self, letter, position, boardlist):
+        if boardlist[letter][position] != "s" and boardlist[letter][position] != "e":
+            # Level 0
+            if letter in ("A", "B", "C", "D"):
+                if boardlist["A"][position] == boardlist["B"][position] == boardlist["C"][position] == boardlist["D"][position]:
+                    return True
+                if boardlist[letter][0] == boardlist[letter][1] == boardlist[letter][2] == boardlist[letter][3]:
+                    return True
+                if letter == "A":
+                    if position == 0:
+                        if boardlist["A"][0] == boardlist["A"][1] == boardlist["B"][0] == boardlist["B"][1]:
+                            return True
+                    if position == 1:
+                        if boardlist["A"][0] == boardlist["A"][1] == boardlist["B"][0] == boardlist["B"][1]:
+                            return True
+                        if boardlist["A"][1] == boardlist["A"][2] == boardlist["B"][1] == boardlist["B"][2]:
+                            return True
+                    if position == 2:
+                        if boardlist["A"][2] == boardlist["A"][3] == boardlist["B"][2] == boardlist["B"][3]:
+                            return True
+                        if boardlist["A"][1] == boardlist["A"][2] == boardlist["B"][1] == boardlist["B"][2]:
+                            return True
+                    if position == 3:
+                        if boardlist["A"][2] == boardlist["A"][3] == boardlist["B"][2] == boardlist["B"][3]:
+                            return True
+                if letter == "B":
+                    if position == 0:
+                        if boardlist["B"][0] == boardlist["B"][1] == boardlist["A"][0] == boardlist["A"][1]:
+                            return True
+                        if boardlist["B"][0] == boardlist["B"][1] == boardlist["C"][0] == boardlist["C"][1]:
+                            return True
+                    if position == 1:
+                        if boardlist["B"][0] == boardlist["B"][1] == boardlist["A"][0] == boardlist["A"][1]:
+                            return True
+                        if boardlist["B"][0] == boardlist["B"][1] == boardlist["C"][0] == boardlist["C"][1]:
+                            return True
+                        if boardlist["B"][1] == boardlist["A"][1] == boardlist["B"][2] == boardlist["A"][2]:
+                            return True
+                        if boardlist["B"][1] == boardlist["C"][1] == boardlist["B"][2] == boardlist["C"][2]:
+                            return True
+                    if position == 2:
+                        if boardlist["B"][1] == boardlist["A"][1] == boardlist["B"][2] == boardlist["A"][2]:
+                            return True
+                        if boardlist["B"][1] == boardlist["C"][1] == boardlist["B"][2] == boardlist["C"][2]:
+                            return True
+                        if boardlist["B"][2] == boardlist["A"][2] == boardlist["B"][3] == boardlist["A"][3]:
+                            return True
+                        if boardlist["B"][2] == boardlist["C"][2] == boardlist["B"][3] == boardlist["C"][3]:
+                            return True
+                    if position == 3:
+                        if boardlist["B"][2] == boardlist["A"][2] == boardlist["B"][3] == boardlist["A"][3]:
+                            return True
+                        if boardlist["B"][2] == boardlist["C"][2] == boardlist["B"][3] == boardlist["C"][3]:
+                            return True
+                if letter == "C":
+                    if position == 0:
+                        if boardlist["C"][0] == boardlist["B"][0] == boardlist["B"][1] == boardlist["C"][1]:
+                            return True
+                        if boardlist["C"][0] == boardlist["D"][0] == boardlist["D"][1] == boardlist["C"][1]:
+                            return True
+                    if position == 1:
+                        if boardlist["C"][0] == boardlist["B"][0] == boardlist["B"][1] == boardlist["C"][1]:
+                            return True
+                        if boardlist["C"][0] == boardlist["D"][0] == boardlist["D"][1] == boardlist["C"][1]:
+                            return True
+                        if boardlist["C"][1] == boardlist["B"][1] == boardlist["B"][2] == boardlist["C"][2]:
+                            return True
+                        if boardlist["C"][1] == boardlist["C"][2] == boardlist["D"][1] == boardlist["D"][2]:
+                            return True
+                    if position == 2:
+                        if boardlist["C"][1] == boardlist["B"][1] == boardlist["B"][2] == boardlist["C"][2]:
+                            return True
+                        if boardlist["C"][1] == boardlist["C"][2] == boardlist["D"][1] == boardlist["D"][2]:
+                            return True
+                        if boardlist["C"][2] == boardlist["B"][2] == boardlist["B"][2] == boardlist["C"][3]:
+                            return True
+                        if boardlist["C"][2] == boardlist["C"][3] == boardlist["D"][3] == boardlist["D"][2]:
+                            return True
+                    if position == 3:
+                        if boardlist["C"][2] == boardlist["B"][2] == boardlist["B"][3] == boardlist["C"][3]:
+                            return True
+                        if boardlist["C"][2] == boardlist["C"][3] == boardlist["D"][3] == boardlist["D"][2]:
+                            return True
+                if letter == "D":
+                    if position == 0:
+                        if boardlist["D"][0] == boardlist["C"][0] == boardlist["C"][1] == boardlist["D"][1]:
+                            return True
+                    if position == 1:
+                        if boardlist["D"][0] == boardlist["C"][0] == boardlist["C"][1] == boardlist["D"][1]:
+                            return True
+                        if boardlist["D"][1] == boardlist["C"][1] == boardlist["C"][2] == boardlist["D"][2]:
+                            return True
+                    if position == 2:
+                        if boardlist["D"][1] == boardlist["C"][1] == boardlist["C"][2] == boardlist["D"][2]:
+                            return True
+                        if boardlist["D"][2] == boardlist["C"][2] == boardlist["C"][3] == boardlist["D"][3]:
+                            return True
+                    if position == 3:
+                        if boardlist["D"][2] == boardlist["C"][2] == boardlist["C"][3] == boardlist["D"][3]:
+                            return True
+            # Level 1
+            if letter in ("E", "F", "G"):
+                if boardlist["E"][position] == boardlist["F"][position] == boardlist["G"][position]:
+                    return True
+                if boardlist[letter][0] == boardlist[letter][1] == boardlist[letter][2]:
+                    return True
+                if letter == "E":
+                    if position == 0:
+                        if boardlist["E"][0] == boardlist["E"][1] == boardlist["F"][0] == boardlist["F"][1]:
+                            return True
+                    if position == 2:
+                        if boardlist["E"][1] == boardlist["E"][2] == boardlist["F"][1] == boardlist["F"][2]:
+                            return True
+                    if position == 1:
+                        if boardlist["E"][0] == boardlist["E"][1] == boardlist["F"][0] == boardlist["F"][1]:
+                            return True
+                        if boardlist["E"][1] == boardlist["E"][2] == boardlist["F"][1] == boardlist["F"][2]:
+                            return True
+                if letter == "F":
+                    if position == 0:
+                        if boardlist["E"][0] == boardlist["E"][1] == boardlist["F"][0] == boardlist["F"][1]:
+                            return True
+                        if boardlist["G"][0] == boardlist["G"][1] == boardlist["F"][0] == boardlist["F"][1]:
+                            return True
+                    if position == 2:
+                        if boardlist["E"][1] == boardlist["E"][2] == boardlist["F"][1] == boardlist["F"][2]:
+                            return True
+                        if boardlist["G"][1] == boardlist["G"][2] == boardlist["F"][1] == boardlist["F"][2]:
+                            return True
+                    if position == 1:
+                        if boardlist["E"][0] == boardlist["E"][1] == boardlist["F"][0] == boardlist["F"][1]:
+                            return True
+                        if boardlist["G"][0] == boardlist["G"][1] == boardlist["F"][0] == boardlist["F"][1]:
+                            return True
+                        if boardlist["E"][1] == boardlist["E"][2] == boardlist["F"][1] == boardlist["F"][2]:
+                            return True
+                        if boardlist["G"][1] == boardlist["G"][2] == boardlist["F"][1] == boardlist["F"][2]:
+                            return True
+                if letter == "G":
+                    if position == 0:
+                        if boardlist["G"][0] == boardlist["G"][1] == boardlist["F"][0] == boardlist["F"][1]:
+                            return True
+                    if position == 2:
+                        if boardlist["G"][1] == boardlist["G"][2] == boardlist["F"][1] == boardlist["F"][2]:
+                            return True
+                    if position == 1:
+                        if boardlist["G"][0] == boardlist["G"][1] == boardlist["F"][0] == boardlist["F"][1]:
+                            return True
+                        if boardlist["G"][1] == boardlist["G"][2] == boardlist["F"][1] == boardlist["F"][2]:
+                            return True
+            # Level 2
+            if letter in ("H", "I"):
+                if boardlist["H"][0] == boardlist["H"][1] == boardlist["I"][0] == boardlist["I"][1]:
+                    return True
+            return False
+        return False
+
+    # Checks if a position can be removed based on if any piece is on top of it
+    # @Returns True if no piece stands on top of the position
+    # @Returns False if a piece is stacked on top of the position
+    def mcanremove(self, letter, position, boardlist):
+        if letter == "A":
+            if position == 0:
+                if boardlist["E"][0] in ("s", "e"):
+                    return True
+            if position == 1:
+                if boardlist["E"][0] in ("s", "e") and boardlist["E"][1] in ("s", "e"):
+                    return True
+            if position == 2:
+                if boardlist["E"][1] in ("s", "e") and boardlist["E"][2] in ("s", "e"):
+                    return True
+            if position == 3:
+                if boardlist["E"][2] in ("s", "e"):
+                    return True
+        elif letter == "B":
+            if position == 0:
+                if boardlist["E"][0] in ("s", "e") and boardlist["F"][0] in ("s", "e"):
+                    return True
+            if position == 1:
+                if boardlist["E"][0] in ("s", "e") and boardlist["F"][0] in ("s", "e") and boardlist["E"][1] in ("s", "e") and boardlist["F"][1] in ("s", "e"):
+                    return True
+            if position == 2:
+                if boardlist["E"][1] in ("s", "e") and boardlist["F"][1] in ("s", "e") and boardlist["E"][2] in ("s", "e") and boardlist["F"][2] in ("s", "e"):
+                    return True
+            if position == 3:
+                if boardlist["E"][2] in ("s", "e") and boardlist["F"][2] in ("s", "e"):
+                    return True
+        elif letter == "C":
+            if position == 0:
+                if boardlist["F"][0] in ("s", "e") and boardlist["G"][0] in ("s", "e"):
+                    return True
+            if position == 1:
+                if boardlist["F"][0] in ("s", "e") and boardlist["G"][0] in ("s", "e") and boardlist["F"][1] in ("s", "e") and boardlist["G"][1] in ("s", "e"):
+                    return True
+            if position == 2:
+                if boardlist["F"][1] in ("s", "e") and boardlist["F"][2] in ("s", "e") and boardlist["G"][1] in ("s", "e") and boardlist["G"][2] in ("s", "e"):
+                    return True
+            if position == 3:
+                if boardlist["F"][2] in ("s", "e") and boardlist["G"][2] in ("s", "e"):
+                    return True
+        elif letter == "D":
+            if position == 0:
+                if boardlist["G"][0] in ("s", "e"):
+                    return True
+            if position == 1:
+                if boardlist["G"][0] in ("s", "e") and  boardlist["G"][1] in ("s", "e"):
+                    return True
+            if position == 2:
+                if boardlist["G"][1] in ("s", "e") and  boardlist["G"][2] in ("s", "e"):
+                    return True
+            if position == 3:
+                if boardlist["G"][2] in ("s", "e"):
+                    return True
+        elif letter == "E":
+            if position == 0:
+                if boardlist["H"][0] in ("s", "e"):
+                    return True
+            if position == 1:
+                if boardlist["H"][0] in ("s", "e") and boardlist["H"][1] in ("s", "e"):
+                    return True
+            if position == 2:
+                if boardlist["H"][1] in ("s", "e"):
+                    return True
+        elif letter == "F":
+            if position == 0:
+                if boardlist["H"][0] in ("s", "e") and boardlist["I"][0] in ("s", "e"):
+                    return True
+            if position == 1:
+                if boardlist["H"][0] in ("s", "e") and boardlist["H"][1] in ("s", "e") and boardlist["I"][0] in ("s", "e") and boardlist["I"][1] in ("s", "e"):
+                    return True
+            if position == 2:
+                if boardlist["H"][1] in ("s", "e") and boardlist["I"][1] in ("s", "e"):
+                    return True
+        elif letter == "G":
+            if position == 0:
+                if boardlist["I"][0] in ("s", "e"):
+                    return True
+            if position == 1:
+                if boardlist["I"][0] in ("s", "e") and boardlist["I"][1] in ("s", "e"):
+                    return True
+            if position == 2:
+                if boardlist["I"][1] in ("s", "e"):
+                    return True
+        elif letter in ("H", "I"):
+            return True
+        return False
+
+    # Evaluation function
+    # Evaluates based on after placing the piece down
+    # @Returns the score of evaluation
+    def evaluate(self, boardlist, letter, position, mypiece, mynumber, theirpiece, theirnumber):
+        piecepoint = 140
+        point = 60
+        removepoint = 20
+        score = (mynumber - theirnumber) * piecepoint
+        if boardlist["J"][0] == mypiece:
+            score = math.inf
+            return score
+        elif boardlist["J"][0] == theirpiece:
+            score = -math.inf
+            return score
+        if boardlist[letter][position] == mypiece:
+            if letter in ("B", "C"):
+                score += 10
+                if position in (1, 2):
+                    score += 10
+            elif position in ("E", "F", "G"):
+                if position == 1:
+                    score += 10
+                if letter == "F":
+                    score += 10
+            if self.mrcheck(letter, position, boardlist):
+                score += 130
+        elif boardlist[letter][position] == theirpiece:
+            if letter in ("B", "C"):
+                score -= 10
+                if position in (1, 2):
+                    score -= 10
+            if self.mrcheck(letter, position, boardlist):
+                score -= 130
+
+        for l in range(9):
+            lett = "A"
+            lett = chr(ord(lett) + l)
+            for i, x in enumerate(boardlist[lett]):
+                if x == "e":
+                    self.mplace(lett, i, mypiece, boardlist)
+                    if self.mrcheck(lett, i, boardlist):
+                        score += point
+                    self.mundoplace(lett, i, boardlist)
+                    self.mplace(lett, i, theirpiece, boardlist)
+                    if self.mrcheck(lett, i, boardlist):
+                        score -= point
+                    self.mundoplace(lett, i, boardlist)
+                elif x != "s":
+                    if self.mcanremove(lett, i, boardlist):
+                        if x == mypiece:
+                            score += removepoint
+                        else:
+                            score -= removepoint
+
+        return score
+
+    def move(self, boardlist, mynumber, theirnumber, mypiece, theirpiece, flag):
+        myboardlist = copy.deepcopy(boardlist)
+        t0 = time.time()
+        #check = self.minimax(myboardlist, 0, mypiece, mynumber, theirpiece, theirnumber, 2, flag)
+        check = self.alphabeta(-math.inf, math.inf, myboardlist, 0, mypiece, mynumber, theirpiece, theirnumber, 4, flag)
+        t1 = time.time()
+        print("AI player chooses:", end=" ")
+        print(check[1])
+        print("AI used: ", end="")
+        print(t1 - t0, end="")
+        print(" seconds")
+        return check[1]
 
 #######################################
 ########### Sets up the game ##########
@@ -1808,18 +2816,22 @@ def main():
     print("To raise a stone please enter its destination then the position of the piece for example E,0,A,3")
     print("For optional removes, if you do not wish to remove any pieces enter _ to not remove any pieces")
     print("Enjoy the game.")
-    player1 = input("Is player 1 (white) human or machine? (h or m) ")
-    if player1 == "h":
+    player1 = input("Is player 1 (white) human or AI? (H or A) ")
+    if player1 == "H":
         player1 = Player("Human (White)")
-    elif player1 == "m":
-        player1 = Machine("Machine (White)")
+    elif player1 == "A":
+        player1 = Artificial("AI (White)")
+    elif player1 == "A2":
+        player1 = Artificial2("AI-2 (White)")
     else:
         return
-    player2 = input("Is player 2 (black) human or machine? (h or m) ")
-    if player2 == "h":
+    player2 = input("Is player 2 (black) human or AI? (H or A) ")
+    if player2 == "H":
         player2 = Player("Human (Black)")
-    elif player2 == "m":
-        player2 = Machine("Machine (Black)")
+    elif player2 == "A":
+        player2 = Artificial("AI (Black)")
+    elif player2 == "A2":
+        player2 = Artificial("AI-2 (Black)")
     else:
         return
 
