@@ -2,6 +2,9 @@
 # CITS3001 AI PROJECT 2016                                         #
 # GAME: PYLOS                                                      #
 # AUTHOR: SIMING ZHANG (21147006) and CAMERON ARMSTRONG (21194619) #
+# Reference: http://callmesaint.com/python-minimax-tutorial/       #
+#            basic game playing functionalities studied from this  #
+#            website                                               #
 #------------------------------------------------------------------#
 import copy
 import math
@@ -785,7 +788,6 @@ class Board(object):
     def win(self,player):
         self.board_visual()
         print(player.name + " won!")
-
 
 #######################################
 ############ Class: Player ############
@@ -2795,10 +2797,14 @@ class Artificial2(Player):
 
     def move(self, boardlist, mynumber, theirnumber, mypiece, theirpiece, flag):
         myboardlist = copy.deepcopy(boardlist)
+        #f = open('workfile.txt', 'a')
         t0 = time.time()
         #check = self.minimax(myboardlist, 0, mypiece, mynumber, theirpiece, theirnumber, 2, flag)
-        check = self.alphabeta(-math.inf, math.inf, myboardlist, 0, mypiece, mynumber, theirpiece, theirnumber, 4, flag)
+        check = self.alphabeta(-math.inf, math.inf, myboardlist, 0, mypiece, mynumber, theirpiece, theirnumber, 3, flag)
         t1 = time.time()
+        #t2 = t1-t0
+        #f.write(str(t2))
+        #f.write('\n')
         print("AI player chooses:", end=" ")
         print(check[1])
         print("AI used: ", end="")
